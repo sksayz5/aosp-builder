@@ -66,6 +66,8 @@ jobs:
     - name: Create simulated physical disk
       id: disk
       # if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
+      env:
+        path_build: /android/lineage
       working-directory: /
       run: |
         echo -e "Current working directory: $(pwd)"
