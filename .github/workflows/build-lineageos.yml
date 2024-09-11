@@ -68,7 +68,7 @@ jobs:
 
     - name: Create simulated physical disk
       id: disk
-      if: ${{ 'true' == 'false' }} # disable
+      # if: ${{ 'true' == 'false' }} # disable
       env:
         path_build: /android/lineage
       working-directory: /
@@ -112,10 +112,10 @@ jobs:
         branch_lineage: lineage-18.1
       working-directory: /
       run: |
-        sudo mkdir -p ~/bin
+        mkdir -p ~/bin
         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-        sudo chmod a+x ~/bin/repo
-        sudo mkdir -p /android/lineage
+        chmod a+x ~/bin/repo
+        mkdir -p /android/lineage
         cd /android/lineage
         ~/bin/repo init -u https://github.com/LineageOS/android.git -b ${{ env.branch_lineage }} --git-lfs
         df -Th
