@@ -121,7 +121,7 @@ jobs:
       working-directory: /android/lineage
       run: |
         # cd /android/lineage
-        repo sync -j4
+        ~/bin/repo sync -j4
         echo "Source code synced"
 
     - name: Build LineageOS
