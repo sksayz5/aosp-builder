@@ -109,11 +109,12 @@ jobs:
         branch_lineage: lineage-18.1
       working-directory: /
       run: |
+        mkdir -p ~/bin
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod a+x ~/bin/repo
         mkdir -p /android/lineage
         cd /android/lineage
-        curl https://storage.googleapis.com/git-repo-downloads/repo > /bin/repo
-        chmod a+x /bin/repo
-        /bin/repo init -u https://github.com/LineageOS/android.git -b ${{ env.branch_lineage }} --git-lfs
+        ~/bin/repo init -u https://github.com/LineageOS/android.git -b ${{ env.branch_lineage }} --git-lfs
         echo "Repository initialized"
 
     - name: Sync LineageOS source
