@@ -105,11 +105,4 @@ jobs:
         token: "${{ secrets.GITHUB_TOKEN }}"
         # bodyFile: "${{ env.release_md }}"
         body: "lineageos"
-
-    - name: Upload build artifacts
-      id: artifact
-      if: ${{ 'true' == 'false' }} # disable
-      uses: actions/upload-artifact@v2
-      with:
-        name: lineageos-build
-        path: ~/android/lineage/out/target/product/ginkgo/*.zip
+        
