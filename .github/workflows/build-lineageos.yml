@@ -238,15 +238,17 @@ jobs:
 
       - name: Build LineageOS
         id: build
+        env:
+          target: "ginkgo"
         working-directory: ${{ env.path_build }}
         run: |
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
           source build/envsetup.sh
-          breakfast ginkgo
+          breakfast ${{ env.target }}
           croot
-          brunch ginkgo
+          brunch ${{ env.target }}
           echo "Build completed"
 
       - name: Upload OpenWrt to Release
