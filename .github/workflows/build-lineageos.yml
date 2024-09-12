@@ -193,6 +193,7 @@ jobs:
           export USE_CCACHE=1
           export CCACHE_EXEC=/usr/bin/ccache
           ccache -M 50G
+          ccache -o compression=true
 
       - name: Initialize LineageOS source
         env:
@@ -215,6 +216,7 @@ jobs:
           # cd /android/lineage
           # ~/bin/repo sync -j4
           ~/bin/repo sync -j$(($(nproc) + 1))
+          df -Th
           echo "Source code synced"
 
       - name: Build LineageOS
