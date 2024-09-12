@@ -158,7 +158,7 @@ jobs:
           sudo mkdir -p "${path_build}"
           sudo mount /dev/github/runner "${path_build}"
           sudo chown -R runner:runner "${path_build}"
-          
+
           df -Th
           echo "status=success" >> "${GITHUB_OUTPUT}"
 
@@ -182,7 +182,12 @@ jobs:
           chmod a+x ~/bin/repo
           mkdir -p /android/lineage
           cd /android/lineage
-          ~/bin/repo init -u https://github.com/LineageOS/android.git -b ${{ env.branch_lineage }} --git-lfs
+          ~/bin/repo init -u https://github.com/LineageOS/android.git \
+            --manifest-branch ${{ env.branch_lineage }} \
+            --groups=default,ginkgo \
+            --depth=1 \
+            --git-lfs \
+            --quiet
           df -Th
           echo "Repository initialized"
 
@@ -219,4 +224,3 @@ jobs:
           token: "${{ secrets.GITHUB_TOKEN }}"
           # bodyFile: "${{ env.release_md }}"
           body: "lineageos"
-
