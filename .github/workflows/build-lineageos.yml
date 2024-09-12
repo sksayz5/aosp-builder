@@ -21,6 +21,7 @@ jobs:
         run: |
           echo -e "Current working directory: $(pwd)"
           # 删除docker所有镜像
+          docker image list
           # docker rmi $(docker images -q)
           docker images -q | xargs docker rmi -f
           # # 删除所有不再使用的 docker 镜像、容器、网络和数据卷
