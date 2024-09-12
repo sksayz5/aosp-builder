@@ -74,27 +74,43 @@ jobs:
       working-directory: /
       run: |
         echo -e "Current working directory: $(pwd)"
-        # 计算 /mnt 分区的可用空间（减去 1GB 作为缓冲）, 计算根分区的可用空间（减去 4GB 作为缓冲）
-        mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
-        root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
-        # 创建一个大小为 mnt_size 的文件 /mnt/mnt.img, 创建一个大小为 root_size 的文件 /root.img
-        sudo truncate -s "${mnt_size}"G /mnt/mnt.img
-        sudo truncate -s "${root_size}"G /root.img
-        # 将这两个文件关联到 loop 设备, 在这两个 loop 设备上创建物理卷, 创建一个名为 github 的卷组，包含这两个物理卷
-        sudo losetup /dev/loop6 /mnt/mnt.img
-        sudo losetup /dev/loop7 /root.img
-        sudo pvcreate /dev/loop6
-        sudo pvcreate /dev/loop7
-        sudo vgcreate github /dev/loop6 /dev/loop7
 
-        # 在 github 卷组上创建一个名为 runner 的逻辑卷，使用所有可用空间, 在 runner 逻辑卷上创建一个 XFS 文件系统
+        # 获取 /mnt 和 / 分区的剩余字节数，预留适当的缓冲空间
+        mnt_size=$(expr $(df -B1 /mnt | tail -1 | awk '{print $4}') - 1*1024*1024*1024)
+        root_size=$(expr $(df -B1 / | tail -1 | awk '{print $4}') - 4*1024*1024*1024)
+
+        echo "Available space in /mnt (bytes): $mnt_size"
+        echo "Available space in / (bytes): $root_size"
+
+        # 动态选择更大分区来创建磁盘文件
+        if [ "$mnt_size" -gt "$root_size" ]; then
+            disk_size=$mnt_size
+            disk_file="/mnt/mnt.img"
+            echo "Using /mnt for virtual disk"
+        else
+            disk_size=$root_size
+            disk_file="/root.img"
+            echo "Using / for virtual disk"
+        fi
+
+        # 创建大小为 disk_size 的虚拟磁盘文件
+        sudo truncate -s "${disk_size}" /${disk_file}
+        
+        # 将磁盘文件与 loop 设备关联，创建物理卷和卷组
+        sudo losetup /dev/loop6 ${disk_file}
+        sudo pvcreate /dev/loop6
+        sudo vgcreate github /dev/loop6
+        
+        # 在卷组中创建逻辑卷，并在其上创建 XFS 文件系统
         sudo lvcreate -n runner -l 100%FREE github
         sudo mkfs.xfs /dev/github/runner
-        # 创建一个挂载点 ${path_build}, 将 runner 逻辑卷挂载到 ${path_build}, 将 ${path_build} 的所有者和组更改为 runner
+        
+        # 挂载逻辑卷并更改目录权限
         sudo mkdir -p ${path_build}
         sudo mount /dev/github/runner ${path_build}
         sudo chown -R runner.runner ${path_build}
 
+        # 打印当前分区信息，确认挂载成功
         df -Th
         echo "status=success" >> ${GITHUB_OUTPUT}
 
