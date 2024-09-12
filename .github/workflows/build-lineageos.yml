@@ -9,217 +9,217 @@ jobs:
     name: Build LineageOS
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@main
+      - name: Checkout repository
+        uses: actions/checkout@main
 
-    - name: Clear environment
-      id: clearinit
-      # if: ${{ 'true' == 'false' }} # disable
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      working-directory: /
-      run: |
-        echo -e "Current working directory: $(pwd)"
-        # 删除docker所有镜像
-        docker rmi $(docker images -q) 2>/dev/null
-        # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
-        [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
-        # 删除指定的目录及其所有内容，忽略所有错误信息
-        sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
-        # 关闭所有交换空间 删除指定的交换文件
-        sudo swapoff -a
-        sudo rm -f /swapfile /mnt/swapfile
+      - name: Clear environment
+        id: clearinit
+        # if: ${{ 'true' == 'false' }} # disable
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+          # 删除docker所有镜像
+          docker rmi $(docker images -q) 2>/dev/null
+          # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
+          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+          # 删除指定的目录及其所有内容，忽略所有错误信息
+          sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
+          # 关闭所有交换空间 删除指定的交换文件
+          sudo swapoff -a
+          sudo rm -f /swapfile /mnt/swapfile
 
-        # 删除所有不再需要的软件包及其配置文件, 清理 apt 的缓存
-        packages_purge=(
-          "azure-cli*"
-          "docker*"
-          "ghc*"
-          "zulu*"
-          "llvm*"
-          "firefox"
-          "google*"
-          "dotnet*"
-          "powershell"
-          "openjdk*"
-          "mongodb*"
-          "moby*"
-        )
-        sudo -E apt-get -qq -y update
-        sudo -E apt-get -qq -y purge "${packages_purge[@]}" || true
-        sudo -E apt-get -qq -y autoremove --purge
-        sudo -E apt-get -qq clean
+          # 删除所有不再需要的软件包及其配置文件, 清理 apt 的缓存
+          packages_purge=(
+            "azure-cli*"
+            "docker*"
+            "ghc*"
+            "zulu*"
+            "llvm*"
+            "firefox"
+            "google*"
+            "dotnet*"
+            "powershell"
+            "openjdk*"
+            "mongodb*"
+            "moby*"
+          )
+          sudo -E apt-get -qq -y update
+          sudo -E apt-get -qq -y purge "${packages_purge[@]}" || true
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
 
-        df -Th
-        echo "status=success" >> ${GITHUB_OUTPUT}
+          df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
-    - name: Initialization environment
-      id: init
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      working-directory: /
-      run: |
-        echo -e "Current working directory: $(pwd)"
+      - name: Initialization environment
+        id: init
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
 
-        packages_install=(
-          "bc" 
-          "bison" 
-          "build-essential" 
-          "ccache" 
-          "curl" 
-          "flex"
-          "g++-multilib" 
-          "gcc-multilib" 
-          "git" 
-          "git-lfs" 
-          "gnupg"
-          "gperf" 
-          "imagemagick" 
-          "lib32readline-dev" 
-          "lib32z1-dev"
-          "libelf-dev" 
-          "liblz4-tool" 
-          "libsdl1.2-dev" 
-          "libssl-dev"
-          "libxml2" 
-          "libxml2-utils" 
-          "lzop" 
-          "pngcrush" 
-          "rsync"
-          "schedtool" 
-          "squashfs-tools" 
-          "xsltproc" 
-          "zip" 
-          "zlib1g-dev"
-        )
-        packages_extra=(
-          "python3"
-        )
-        sudo -E apt-get -qq -y update
-        sudo -E apt-get -qq -y install "${packages_install[@]}"
-        sudo -E apt-get -y install "${packages_extra[@]}"
-        sudo -E systemctl daemon-reload
+          packages_install=(
+            "bc" 
+            "bison" 
+            "build-essential" 
+            "ccache" 
+            "curl" 
+            "flex"
+            "g++-multilib" 
+            "gcc-multilib" 
+            "git" 
+            "git-lfs" 
+            "gnupg"
+            "gperf" 
+            "imagemagick" 
+            "lib32readline-dev" 
+            "lib32z1-dev"
+            "libelf-dev" 
+            "liblz4-tool" 
+            "libsdl1.2-dev" 
+            "libssl-dev"
+            "libxml2" 
+            "libxml2-utils" 
+            "lzop" 
+            "pngcrush" 
+            "rsync"
+            "schedtool" 
+            "squashfs-tools" 
+            "xsltproc" 
+            "zip" 
+            "zlib1g-dev"
+          )
+          packages_extra=(
+            "python3"
+          )
+          sudo -E apt-get -qq -y update
+          sudo -E apt-get -qq -y install "${packages_install[@]}"
+          sudo -E apt-get -y install "${packages_extra[@]}"
+          sudo -E systemctl daemon-reload
 
-        echo "status=success" >> ${GITHUB_OUTPUT}
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
-    - name: Set up JDK
-      uses: actions/setup-java@main
-      with:
-        distribution: 'temurin'
-        java-version: '21'
-    
-    - name: Create simulated physical disk
-      id: disk
-      # if: ${{ 'true' == 'false' }} # disable
-      env:
-        path_build: /android/lineage
-      working-directory: /
-      run: |
-        echo "Current working directory: $(pwd)"
+      - name: Set up JDK
+        uses: actions/setup-java@main
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      
+      - name: Create simulated physical disk
+        id: disk
+        # if: ${{ 'true' == 'false' }} # disable
+        env:
+          path_build: /android/lineage
+        working-directory: /
+        run: |
+          echo "Current working directory: $(pwd)"
 
-        # 获取 /mnt 和 / 分区的剩余空间
-        mnt_available=$(df -B1 /mnt | tail -1 | awk '{print $4}')
-        root_available=$(df -B1 / | tail -1 | awk '{print $4}')
-        echo "Raw available space in /mnt (bytes): ${mnt_available}"
-        echo "Raw available space in / (bytes): ${root_available}"
+          # 获取 /mnt 和 / 分区的剩余空间
+          mnt_available=$(df -B1 /mnt | tail -1 | awk '{print $4}')
+          root_available=$(df -B1 / | tail -1 | awk '{print $4}')
+          echo "Raw available space in /mnt (bytes): ${mnt_available}"
+          echo "Raw available space in / (bytes): ${root_available}"
 
-        # 检查提取的数值是否为有效的数字
-        if ! [[ "${mnt_available}" =~ ^[0-9]+$ ]]; then
-          echo "Error: /mnt available space is not a valid number: ${mnt_available}"
-          exit 1
-        fi
-        if ! [[ "${root_available}" =~ ^[0-9]+$ ]]; then
-          echo "Error: / available space is not a valid number: ${root_available}"
-          exit 1
-        fi
+          # 检查提取的数值是否为有效的数字
+          if ! [[ "${mnt_available}" =~ ^[0-9]+$ ]]; then
+            echo "Error: /mnt available space is not a valid number: ${mnt_available}"
+            exit 1
+          fi
+          if ! [[ "${root_available}" =~ ^[0-9]+$ ]]; then
+            echo "Error: / available space is not a valid number: ${root_available}"
+            exit 1
+          fi
 
-        # 减去缓冲空间：/mnt 和 / 分区分别减去 1GB 和 4GB 作为缓冲
-        mnt_size=$((${mnt_available} - 1 * 1024 * 1024 * 1024))
-        root_size=$((${root_available} - 4 * 1024 * 1024 * 1024))
-        echo "Available space in /mnt (bytes): ${mnt_size}"
-        echo "Available space in / (bytes): ${root_size}"
+          # 减去缓冲空间：/mnt 和 / 分区分别减去 1GB 和 4GB 作为缓冲
+          mnt_size=$((${mnt_available} - 1 * 1024 * 1024 * 1024))
+          root_size=$((${root_available} - 4 * 1024 * 1024 * 1024))
+          echo "Available space in /mnt (bytes): ${mnt_size}"
+          echo "Available space in / (bytes): ${root_size}"
 
-        # 动态选择有更多可用空间的分区来创建虚拟磁盘文件
-        if [ "${mnt_size}" -gt "${root_size}" ]; then
-            disk_size=${mnt_size}
-            disk_file="/mnt/mnt.img"
-            echo "Using /mnt for virtual disk"
-        else
-            disk_size=${root_size}
-            disk_file="/root.img"
-            echo "Using / for virtual disk"
-        fi
+          # 动态选择有更多可用空间的分区来创建虚拟磁盘文件
+          if [ "${mnt_size}" -gt "${root_size}" ]; then
+              disk_size=${mnt_size}
+              disk_file="/mnt/mnt.img"
+              echo "Using /mnt for virtual disk"
+          else
+              disk_size=${root_size}
+              disk_file="/root.img"
+              echo "Using / for virtual disk"
+          fi
 
-        # 创建虚拟磁盘文件并关联到 loop 设备
-        sudo truncate -s "${disk_size}" "${disk_file}"
-        sudo losetup /dev/loop6 "${disk_file}"
+          # 创建虚拟磁盘文件并关联到 loop 设备
+          sudo truncate -s "${disk_size}" "${disk_file}"
+          sudo losetup /dev/loop6 "${disk_file}"
 
-        # 使用 LVM 创建物理卷、卷组和逻辑卷
-        sudo pvcreate /dev/loop6
-        sudo vgcreate github /dev/loop6
-        sudo lvcreate -n runner -l 100%FREE github
+          # 使用 LVM 创建物理卷、卷组和逻辑卷
+          sudo pvcreate /dev/loop6
+          sudo vgcreate github /dev/loop6
+          sudo lvcreate -n runner -l 100%FREE github
 
-        # 在逻辑卷上创建 XFS 文件系统并挂载
-        sudo mkfs.xfs /dev/github/runner
-        sudo mkdir -p "${path_build}"
-        sudo mount /dev/github/runner "${path_build}"
-        sudo chown -R runner.runner "${path_build}"
+          # 在逻辑卷上创建 XFS 文件系统并挂载
+          sudo mkfs.xfs /dev/github/runner
+          sudo mkdir -p "${path_build}"
+          sudo mount /dev/github/runner "${path_build}"
+          sudo chown -R runner.runner "${path_build}"
 
-        # 打印挂载信息以确认成功
-        df -Th
-        echo "status=success" >> "${GITHUB_OUTPUT}"
+          # 打印挂载信息以确认成功
+          df -Th
+          echo "status=success" >> "${GITHUB_OUTPUT}"
 
-    - name: Set up ccache
-      id: ccache
-      # if: ${{ 'true' == 'false' }} # disable
-      working-directory: /
-      run: |
-        export USE_CCACHE=1
-        export CCACHE_EXEC=/usr/bin/ccache
-        ccache -M 50G
+      - name: Set up ccache
+        id: ccache
+        # if: ${{ 'true' == 'false' }} # disable
+        working-directory: /
+        run: |
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          ccache -M 50G
 
-    - name: Initialize LineageOS source
-      env:
-        branch_lineage: lineage-18.1
-      working-directory: /
-      run: |
-        mkdir -p ~/bin
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-        chmod a+x ~/bin/repo
-        mkdir -p /android/lineage
-        cd /android/lineage
-        ~/bin/repo init -u https://github.com/LineageOS/android.git -b ${{ env.branch_lineage }} --git-lfs
-        df -Th
-        echo "Repository initialized"
+      - name: Initialize LineageOS source
+        env:
+          branch_lineage: lineage-18.1
+        working-directory: /
+        run: |
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          mkdir -p /android/lineage
+          cd /android/lineage
+          ~/bin/repo init -u https://github.com/LineageOS/android.git -b ${{ env.branch_lineage }} --git-lfs
+          df -Th
+          echo "Repository initialized"
 
-    - name: Sync LineageOS source
-      working-directory: /android/lineage
-      run: |
-        # cd /android/lineage
-        # ~/bin/repo sync -j4
-        ~/bin/repo sync -j$(($(nproc) + 1))
-        echo "Source code synced"
+      - name: Sync LineageOS source
+        working-directory: /android/lineage
+        run: |
+          # cd /android/lineage
+          # ~/bin/repo sync -j4
+          ~/bin/repo sync -j$(($(nproc) + 1))
+          echo "Source code synced"
 
-    - name: Build LineageOS
-      working-directory: /android/lineage
-      run: |
-        source build/envsetup.sh
-        breakfast ginkgo
-        croot
-        brunch ginkgo
-        echo "Build completed"
+      - name: Build LineageOS
+        working-directory: /android/lineage
+        run: |
+          source build/envsetup.sh
+          breakfast ginkgo
+          croot
+          brunch ginkgo
+          echo "Build completed"
 
-    - name: Upload OpenWrt to Release
-      id: release
-      uses: ncipollo/release-action@main
-      with:
-        name: "lineageos-build"
-        tag: "lineageos"
-        artifacts: "/android/lineage/out/target/product/ginkgo/*.zip"
-        allowUpdates: true
-        removeArtifacts: false
-        replacesArtifacts: true
-        token: "${{ secrets.GITHUB_TOKEN }}"
-        # bodyFile: "${{ env.release_md }}"
-        body: "lineageos"
+      - name: Upload OpenWrt to Release
+        id: release
+        uses: ncipollo/release-action@main
+        with:
+          name: "lineageos-build"
+          tag: "lineageos"
+          artifacts: "/android/lineage/out/target/product/ginkgo/*.zip"
+          allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          # bodyFile: "${{ env.release_md }}"
+          body: "lineageos"
 
