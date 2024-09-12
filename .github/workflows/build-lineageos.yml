@@ -208,7 +208,7 @@ jobs:
 
           mkdir -p ~/bin
           curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-          chmod a+x ~/bin/repo
+          chmod a+rx ~/bin/repo
 
       - name: Initialize LineageOS source
         working-directory: ${{ env.path_build }}
