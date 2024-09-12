@@ -242,6 +242,16 @@ jobs:
           df -Th
           echo "Source code synced"
 
+      - name: Patch Files
+        id: patch
+        if: ${{ 'true' == 'false' }} # disable
+        working-directory: ${{ env.path_build }}
+        run: |
+          echo "Current working directory: $(pwd)"
+          export PATH=~/bin:$PATH
+
+          echo "Patch completed"
+
       - name: Build PixelExperience
         id: build
         env:
