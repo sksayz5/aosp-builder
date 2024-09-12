@@ -147,24 +147,28 @@ jobs:
           echo "Available space in /mnt (bytes): ${mnt_size}"
           echo "Available space in / (bytes): ${root_size}"
 
-          # 动态选择有更多可用空间的分区来创建虚拟磁盘文件
-          if [ "${mnt_size}" -gt "${root_size}" ]; then
-              disk_size=${mnt_size}
-              disk_file="/mnt/mnt.img"
-              echo "Using /mnt for virtual disk"
-          else
-              disk_size=${root_size}
-              disk_file="/root.img"
-              echo "Using / for virtual disk"
-          fi
-
-          # 创建虚拟磁盘文件并关联到 loop 设备
-          sudo truncate -s "${disk_size}" "${disk_file}"
-          sudo losetup /dev/loop6 "${disk_file}"
+          # # 动态选择有更多可用空间的分区来创建虚拟磁盘文件
+          # if [ "${mnt_size}" -gt "${root_size}" ]; then
+          #     disk_size=${mnt_size}
+          #     disk_file="/mnt/mnt.img"
+          #     echo "Using /mnt for virtual disk"
+          # else
+          #     disk_size=${root_size}
+          #     disk_file="/root.img"
+          #     echo "Using / for virtual disk"
+          # fi
+          # # 创建虚拟磁盘文件并关联到 loop 设备
+          # sudo truncate -s "${disk_size}" "${disk_file}"
+          # sudo losetup /dev/loop6 "${disk_file}"
 
           # 使用 LVM 创建物理卷、卷组和逻辑卷
+          # sudo pvcreate /dev/loop6
+          # sudo vgcreate github /dev/loop6
+          sudo losetup /dev/loop6 /mnt/mnt.img
+          sudo losetup /dev/loop7 /root.img
           sudo pvcreate /dev/loop6
-          sudo vgcreate github /dev/loop6
+          sudo pvcreate /dev/loop7
+          sudo vgcreate github /dev/loop6 /dev/loop7
           sudo lvcreate -n runner -l 100%FREE github
 
           # 在逻辑卷上创建 XFS 文件系统并挂载
