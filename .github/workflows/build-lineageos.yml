@@ -105,6 +105,8 @@ jobs:
           sudo -E apt-get -qq -y update
           sudo -E apt-get -qq -y install "${packages_install[@]}"
           sudo -E apt-get -y install "${packages_extra[@]}"
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
 
           echo "status=success" >> ${GITHUB_OUTPUT}
