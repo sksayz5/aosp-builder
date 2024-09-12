@@ -75,45 +75,42 @@ jobs:
       run: |
         echo "Current working directory: $(pwd)"
 
-        # 获取 /mnt 和 / 分区的剩余空间，分别减去 1GB 和 4GB 作为缓冲
+        # 获取 /mnt 和 / 分区的剩余空间
         mnt_available=$(df -B1 /mnt | tail -1 | awk '{print $4}')
         root_available=$(df -B1 / | tail -1 | awk '{print $4}')
-
-        echo "Raw available space in /mnt (bytes): $mnt_available"
-        echo "Raw available space in / (bytes): $root_available"
+        echo "Raw available space in /mnt (bytes): ${mnt_available}"
+        echo "Raw available space in / (bytes): ${root_available}"
 
         # 检查提取的数值是否为有效的数字
-        if ! [[ "$mnt_available" =~ ^[0-9]+$ ]]; then
-          echo "Error: /mnt available space is not a valid number: $mnt_available"
+        if ! [[ "${mnt_available}" =~ ^[0-9]+$ ]]; then
+          echo "Error: /mnt available space is not a valid number: ${mnt_available}"
+          exit 1
+        fi
+        if ! [[ "${root_available}" =~ ^[0-9]+$ ]]; then
+          echo "Error: / available space is not a valid number: ${root_available}"
           exit 1
         fi
 
-        if ! [[ "$root_available" =~ ^[0-9]+$ ]]; then
-          echo "Error: / available space is not a valid number: $root_available"
-          exit 1
-        fi
-
-        # 减去缓冲空间
-        mnt_size=$(($mnt_available - 1 * 1024 * 1024 * 1024))
-        root_size=$(($root_available - 4 * 1024 * 1024 * 1024))
-
-        echo "Available space in /mnt (bytes): $mnt_size"
-        echo "Available space in / (bytes): $root_size"
+        # 减去缓冲空间：/mnt 和 / 分区分别减去 1GB 和 4GB 作为缓冲
+        mnt_size=$((${mnt_available} - 1 * 1024 * 1024 * 1024))
+        root_size=$((${root_available} - 4 * 1024 * 1024 * 1024))
+        echo "Available space in /mnt (bytes): ${mnt_size}"
+        echo "Available space in / (bytes): ${root_size}"
 
         # 动态选择有更多可用空间的分区来创建虚拟磁盘文件
-        if [ "$mnt_size" -gt "$root_size" ]; then
-            disk_size=$mnt_size
+        if [ "${mnt_size}" -gt "${root_size}" ]; then
+            disk_size=${mnt_size}
             disk_file="/mnt/mnt.img"
             echo "Using /mnt for virtual disk"
         else
-            disk_size=$root_size
+            disk_size=${root_size}
             disk_file="/root.img"
             echo "Using / for virtual disk"
         fi
 
         # 创建虚拟磁盘文件并关联到 loop 设备
-        sudo truncate -s "$disk_size" "$disk_file"
-        sudo losetup /dev/loop6 "$disk_file"
+        sudo truncate -s "${disk_size}" "${disk_file}"
+        sudo losetup /dev/loop6 "${disk_file}"
 
         # 使用 LVM 创建物理卷、卷组和逻辑卷
         sudo pvcreate /dev/loop6
@@ -122,13 +119,13 @@ jobs:
 
         # 在逻辑卷上创建 XFS 文件系统并挂载
         sudo mkfs.xfs /dev/github/runner
-        sudo mkdir -p ${path_build}
-        sudo mount /dev/github/runner ${path_build}
-        sudo chown -R runner.runner ${path_build}
+        sudo mkdir -p "${path_build}"
+        sudo mount /dev/github/runner "${path_build}"
+        sudo chown -R runner.runner "${path_build}"
 
         # 打印挂载信息以确认成功
         df -Th
-        echo "status=success" >> ${GITHUB_OUTPUT}
+        echo "status=success" >> "${GITHUB_OUTPUT}"
 
     - name: Set up ccache
       id: ccache
