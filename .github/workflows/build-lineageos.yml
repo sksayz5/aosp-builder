@@ -187,10 +187,10 @@ jobs:
           cd /android/lineage
           repo init -u https://github.com/LineageOS/android.git \
             --manifest-branch ${{ env.branch_lineage }} \
-            --groups=default,ginkgo \
             --depth=1 \
             --git-lfs \
-            --quiet
+            --verbose
+            # --groups=default,ginkgo \
           
           df -Th
           echo "Repository initialized"
