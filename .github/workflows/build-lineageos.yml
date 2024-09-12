@@ -220,10 +220,10 @@ jobs:
           export PATH=~/bin:$PATH
 
           repo init -u https://github.com/LineageOS/android.git \
-            --manifest-branch ${{ env.manifest-branch }}
-            # --depth=1 \
-            # --git-lfs \
-            # --verbose
+            --manifest-branch ${{ env.manifest-branch }} \
+            --depth=1 \
+            --git-lfs \
+            --verbose
           
           df -Th
           echo "Repository initialized"
