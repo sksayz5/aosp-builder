@@ -98,7 +98,6 @@ jobs:
           )
           packages_extra=(
             "python3"
-            "nsjail"
           )
           sudo -E apt-get -qq -y update
           sudo -E apt-get -qq -y install "${packages_install[@]}"
