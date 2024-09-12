@@ -98,6 +98,7 @@ jobs:
           )
           packages_extra=(
             "python3"
+            "nsjail"
           )
           sudo -E apt-get -qq -y update
           sudo -E apt-get -qq -y install "${packages_install[@]}"
@@ -181,14 +182,17 @@ jobs:
           mkdir -p ~/bin
           curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
           chmod a+x ~/bin/repo
+          export PATH=~/bin:$PATH
+
           mkdir -p /android/lineage
           cd /android/lineage
-          ~/bin/repo init -u https://github.com/LineageOS/android.git \
+          repo init -u https://github.com/LineageOS/android.git \
             --manifest-branch ${{ env.branch_lineage }} \
+            --groups=default,ginkgo \
             --depth=1 \
             --git-lfs \
             --quiet
-            # --groups=default,ginkgo \
+          
           df -Th
           echo "Repository initialized"
 
@@ -196,7 +200,9 @@ jobs:
         id: sync
         working-directory: /android/lineage
         run: |
-          ~/bin/repo sync -j$(($(nproc) + 1))
+          export PATH=~/bin:$PATH
+
+          repo sync -j$(($(nproc) + 1))
           df -Th
           echo "Source code synced"
 
@@ -204,6 +210,7 @@ jobs:
         id: build
         working-directory: /android/lineage
         run: |
+          export PATH=~/bin:$PATH
           source build/envsetup.sh
           breakfast ginkgo
           croot
