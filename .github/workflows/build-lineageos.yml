@@ -121,7 +121,7 @@ jobs:
         env:
           path_build: /android/lineage
           mnt_num: 1
-          root_num: 1
+          root_num: 4
         working-directory: /
         run: |
           echo "Current working directory: $(pwd)"
@@ -142,7 +142,7 @@ jobs:
             exit 1
           fi
 
-          # 减去缓冲空间：/mnt 和 / 分区分别减去 1GB 和 4GB 作为缓冲
+          # 减去缓冲空间：/mnt 和 / 分区分别减去缓冲
           mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * 1024 * 1024 * 1024))
           root_size=$((${root_available} - ${{ env.root_num }} * 1024 * 1024 * 1024))
           echo "Available space in /mnt (bytes): ${mnt_size}"
@@ -202,6 +202,7 @@ jobs:
           echo "Repository initialized"
 
       - name: Sync LineageOS source
+        id: sync
         working-directory: /android/lineage
         run: |
           # cd /android/lineage
@@ -210,6 +211,7 @@ jobs:
           echo "Source code synced"
 
       - name: Build LineageOS
+        id: build
         working-directory: /android/lineage
         run: |
           source build/envsetup.sh
