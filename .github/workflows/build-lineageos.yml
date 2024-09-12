@@ -185,10 +185,10 @@ jobs:
           cd /android/lineage
           ~/bin/repo init -u https://github.com/LineageOS/android.git \
             --manifest-branch ${{ env.branch_lineage }} \
-            --groups=default,ginkgo \
             --depth=1 \
             --git-lfs \
             --quiet
+            # --groups=default,ginkgo \
           df -Th
           echo "Repository initialized"
 
@@ -196,8 +196,6 @@ jobs:
         id: sync
         working-directory: /android/lineage
         run: |
-          # cd /android/lineage
-          # ~/bin/repo sync -j4
           ~/bin/repo sync -j$(($(nproc) + 1))
           df -Th
           echo "Source code synced"
