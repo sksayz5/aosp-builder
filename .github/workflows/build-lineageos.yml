@@ -9,6 +9,11 @@ on:
         required: true
         default: 'lineage-18.1'
         type: string
+      android-version:
+        description: 'Android version'
+        required: true
+        default: 'ginkgo'
+        type: string
 
 jobs:
   build:
@@ -17,6 +22,7 @@ jobs:
     env:
       path_build: "/android/lineage"
       manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
+      android-version: ${{ inputs.android-version || 'ginkgo' }}
     steps:
       - name: Set environment variable
         id: var
@@ -241,17 +247,15 @@ jobs:
 
       - name: Build LineageOS
         id: build
-        env:
-          target: "ginkgo"
         working-directory: ${{ env.path_build }}
         run: |
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
           source build/envsetup.sh
-          breakfast ${{ env.target }}
+          breakfast ${{ env.android-version }}
           croot
-          brunch ${{ env.target }} -j$(nproc --all)
+          brunch ${{ env.android-version }} -j$(nproc --all)
           echo "Build completed"
 
       - name: Upload OpenWrt to Release
