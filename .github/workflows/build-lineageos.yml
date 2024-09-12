@@ -1,4 +1,4 @@
-name: (Dev) Build LineageOS
+name: Build LineageOS
 
 on:
   repository_dispatch:
