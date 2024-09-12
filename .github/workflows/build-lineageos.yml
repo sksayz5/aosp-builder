@@ -117,7 +117,6 @@ jobs:
       
       - name: Create simulated physical disk
         id: disk
-        # if: ${{ 'true' == 'false' }} # disable
         env:
           path_build: /android/lineage
           mnt_num: 1
