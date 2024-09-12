@@ -187,7 +187,7 @@ jobs:
 
       - name: Set up ccache
         id: ccache
-        # if: ${{ 'true' == 'false' }} # disable
+        if: ${{ 'true' == 'false' }} # disable
         working-directory: /
         run: |
           export USE_CCACHE=1
