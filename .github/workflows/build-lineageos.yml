@@ -69,9 +69,9 @@ jobs:
     - name: Create simulated physical disk
       id: disk
       # if: ${{ 'true' == 'false' }} # disable
-      working-directory: /
       env:
-        path_build: /build/disk
+        path_build: /android/lineage
+      working-directory: /
       run: |
         echo "Current working directory: $(pwd)"
 
