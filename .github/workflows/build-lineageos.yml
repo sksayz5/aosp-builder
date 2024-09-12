@@ -23,9 +23,11 @@ jobs:
           # 删除docker所有镜像
           docker image list
           # docker rmi $(docker images -q)
-          # docker images -q | xargs docker rmi -f
+          for image in $(docker images -q); do
+            docker rmi -f $image
+          done
           # 删除所有不再使用的 docker 镜像、容器、网络和数据卷
-          docker image prune -a
+          # docker image prune -a
           # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           # 删除指定的目录及其所有内容，忽略所有错误信息
