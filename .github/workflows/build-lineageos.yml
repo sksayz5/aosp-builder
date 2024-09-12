@@ -8,7 +8,28 @@ jobs:
   build:
     name: Build LineageOS
     runs-on: ubuntu-24.04
+    env:
+      path_build: "/android/lineage"
+      manifest-branch: "lineage-18.1"
     steps:
+      - name: Set environment variable
+        id: var
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          path_build="${{ env.path_build }}"
+
+          # ========== GITHUB_ENV ==========
+          env_vars=(
+            "path_build"
+          )
+          for var in "${env_vars[@]}"; do
+            echo "${var}=${!var}" | tee -a $GITHUB_ENV
+          done
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
       - name: Clear environment
         id: clearinit
         env:
@@ -43,7 +64,7 @@ jobs:
             "firefox"
             "google*"
             "dotnet*"
-            "powershell"
+            "powershell*"
             "openjdk*"
             "mongodb*"
             "moby*"
@@ -118,7 +139,7 @@ jobs:
       - name: Create simulated physical disk
         id: disk
         env:
-          path_build: /android/lineage
+          path_build: ${{ env.path_build }}
           mnt_num: 1
           root_num: 4
         working-directory: /
@@ -163,7 +184,7 @@ jobs:
           df -Th
           echo "status=success" >> "${GITHUB_OUTPUT}"
 
-      - name: Set up ccache
+      - name: Setup ccache
         id: ccache
         if: ${{ 'true' == 'false' }} # disable
         working-directory: /
@@ -173,32 +194,36 @@ jobs:
           ccache -M 50G
           ccache -o compression=true
 
-      - name: Initialize LineageOS source
-        env:
-          branch_lineage: lineage-18.1
+      - name: Initialize repo
+        id: init-repo
         working-directory: /
         run: |
+          echo "Current working directory: $(pwd)"
+
           mkdir -p ~/bin
           curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
           chmod a+x ~/bin/repo
+
+      - name: Initialize LineageOS source
+        working-directory: ${{ env.path_build }}
+        run: |
+          echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
-          mkdir -p /android/lineage
-          cd /android/lineage
           repo init -u https://github.com/LineageOS/android.git \
-            --manifest-branch ${{ env.branch_lineage }} \
+            --manifest-branch ${{ env.manifest-branch }} \
             --depth=1 \
             --git-lfs \
             --verbose
-            # --groups=default,ginkgo \
           
           df -Th
           echo "Repository initialized"
 
       - name: Sync LineageOS source
         id: sync
-        working-directory: /android/lineage
+        working-directory: ${{ env.path_build }}
         run: |
+          echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
           repo sync -j$(($(nproc) + 1))
@@ -207,9 +232,11 @@ jobs:
 
       - name: Build LineageOS
         id: build
-        working-directory: /android/lineage
+        working-directory: ${{ env.path_build }}
         run: |
+          echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
+
           source build/envsetup.sh
           breakfast ginkgo
           croot
@@ -222,7 +249,7 @@ jobs:
         with:
           name: "lineageos-build"
           tag: "lineageos"
-          artifacts: "/android/lineage/out/target/product/ginkgo/*.zip"
+          artifacts: "${{ env.path_build }}/out/target/product/ginkgo/*.zip"
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
