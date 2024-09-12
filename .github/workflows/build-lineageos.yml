@@ -65,24 +65,42 @@ jobs:
         sudo -E systemctl daemon-reload
 
         echo "status=success" >> ${GITHUB_OUTPUT}
-
+    
     - name: Create simulated physical disk
       id: disk
       # if: ${{ 'true' == 'false' }} # disable
-      env:
-        path_build: /android/lineage
       working-directory: /
+      env:
+        path_build: /build/disk
       run: |
-        echo -e "Current working directory: $(pwd)"
+        echo "Current working directory: $(pwd)"
 
-        # 获取 /mnt 和 / 分区的剩余字节数，预留适当的缓冲空间
-        mnt_size=$(expr $(df -B1 /mnt | tail -1 | awk '{print $4}') - 1*1024*1024*1024)
-        root_size=$(expr $(df -B1 / | tail -1 | awk '{print $4}') - 4*1024*1024*1024)
+        # 获取 /mnt 和 / 分区的剩余空间，分别减去 1GB 和 4GB 作为缓冲
+        mnt_available=$(df -B1 /mnt | tail -1 | awk '{print $4}')
+        root_available=$(df -B1 / | tail -1 | awk '{print $4}')
+
+        echo "Raw available space in /mnt (bytes): $mnt_available"
+        echo "Raw available space in / (bytes): $root_available"
+
+        # 检查提取的数值是否为有效的数字
+        if ! [[ "$mnt_available" =~ ^[0-9]+$ ]]; then
+          echo "Error: /mnt available space is not a valid number: $mnt_available"
+          exit 1
+        fi
+
+        if ! [[ "$root_available" =~ ^[0-9]+$ ]]; then
+          echo "Error: / available space is not a valid number: $root_available"
+          exit 1
+        fi
+
+        # 减去缓冲空间
+        mnt_size=$(($mnt_available - 1 * 1024 * 1024 * 1024))
+        root_size=$(($root_available - 4 * 1024 * 1024 * 1024))
 
         echo "Available space in /mnt (bytes): $mnt_size"
         echo "Available space in / (bytes): $root_size"
 
-        # 动态选择更大分区来创建磁盘文件
+        # 动态选择有更多可用空间的分区来创建虚拟磁盘文件
         if [ "$mnt_size" -gt "$root_size" ]; then
             disk_size=$mnt_size
             disk_file="/mnt/mnt.img"
@@ -93,24 +111,22 @@ jobs:
             echo "Using / for virtual disk"
         fi
 
-        # 创建大小为 disk_size 的虚拟磁盘文件
-        sudo truncate -s "${disk_size}" /${disk_file}
-        
-        # 将磁盘文件与 loop 设备关联，创建物理卷和卷组
-        sudo losetup /dev/loop6 ${disk_file}
+        # 创建虚拟磁盘文件并关联到 loop 设备
+        sudo truncate -s "$disk_size" "$disk_file"
+        sudo losetup /dev/loop6 "$disk_file"
+
+        # 使用 LVM 创建物理卷、卷组和逻辑卷
         sudo pvcreate /dev/loop6
         sudo vgcreate github /dev/loop6
-        
-        # 在卷组中创建逻辑卷，并在其上创建 XFS 文件系统
         sudo lvcreate -n runner -l 100%FREE github
+
+        # 在逻辑卷上创建 XFS 文件系统并挂载
         sudo mkfs.xfs /dev/github/runner
-        
-        # 挂载逻辑卷并更改目录权限
         sudo mkdir -p ${path_build}
         sudo mount /dev/github/runner ${path_build}
         sudo chown -R runner.runner ${path_build}
 
-        # 打印当前分区信息，确认挂载成功
+        # 打印挂载信息以确认成功
         df -Th
         echo "status=success" >> ${GITHUB_OUTPUT}
 
