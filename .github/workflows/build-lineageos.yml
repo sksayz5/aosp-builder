@@ -132,8 +132,9 @@ jobs:
           echo "Raw available space in / (bytes): ${root_available}"
 
           # 减去缓冲空间：/mnt 和 / 分区分别减去缓冲
-          mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * 1024 * 1024 * 1024))
-          root_size=$((${root_available} - ${{ env.root_num }} * 1024 * 1024 * 1024))
+          gb2bytes=$((1024 * 1024 * 1024))
+          mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * ${gb2bytes} ))
+          root_size=$((${root_available} - ${{ env.root_num }} * ${gb2bytes} ))
           echo "Available space in /mnt (bytes): ${mnt_size}"
           echo "Available space in / (bytes): ${root_size}"
 
