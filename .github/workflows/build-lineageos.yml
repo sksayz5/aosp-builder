@@ -52,12 +52,6 @@ jobs:
         df -Th
         echo "status=success" >> ${GITHUB_OUTPUT}
 
-    - name: Set up JDK
-      uses: actions/setup-java@main
-      with:
-        distribution: 'temurin'
-        java-version: '21'
-
     - name: Initialization environment
       id: init
       env:
@@ -106,6 +100,12 @@ jobs:
         sudo -E systemctl daemon-reload
 
         echo "status=success" >> ${GITHUB_OUTPUT}
+
+    - name: Set up JDK
+      uses: actions/setup-java@main
+      with:
+        distribution: 'temurin'
+        java-version: '21'
     
     - name: Create simulated physical disk
       id: disk
