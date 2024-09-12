@@ -131,41 +131,17 @@ jobs:
           echo "Raw available space in /mnt (bytes): ${mnt_available}"
           echo "Raw available space in / (bytes): ${root_available}"
 
-          # 检查提取的数值是否为有效的数字
-          if ! [[ "${mnt_available}" =~ ^[0-9]+$ ]]; then
-            echo "Error: /mnt available space is not a valid number: ${mnt_available}"
-            exit 1
-          fi
-          if ! [[ "${root_available}" =~ ^[0-9]+$ ]]; then
-            echo "Error: / available space is not a valid number: ${root_available}"
-            exit 1
-          fi
-
           # 减去缓冲空间：/mnt 和 / 分区分别减去缓冲
           mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * 1024 * 1024 * 1024))
           root_size=$((${root_available} - ${{ env.root_num }} * 1024 * 1024 * 1024))
           echo "Available space in /mnt (bytes): ${mnt_size}"
           echo "Available space in / (bytes): ${root_size}"
 
-          # # 动态选择有更多可用空间的分区来创建虚拟磁盘文件
-          # if [ "${mnt_size}" -gt "${root_size}" ]; then
-          #     disk_size=${mnt_size}
-          #     disk_file="/mnt/mnt.img"
-          #     echo "Using /mnt for virtual disk"
-          # else
-          #     disk_size=${root_size}
-          #     disk_file="/root.img"
-          #     echo "Using / for virtual disk"
-          # fi
-          # # 创建虚拟磁盘文件并关联到 loop 设备
-          # sudo truncate -s "${disk_size}" "${disk_file}"
-          # sudo losetup /dev/loop6 "${disk_file}"
-
           # 使用 LVM 创建物理卷、卷组和逻辑卷
           # sudo pvcreate /dev/loop6
           # sudo vgcreate github /dev/loop6
 
-          # 将这两个文件关联到 loop 设备, 在这两个 loop 设备上创建物理卷, 创建一个名为 github 的卷组，包含这两个物理卷
+          # 使用 LVM 创建物理卷、卷组和逻辑卷，将文件关联到 loop 设备, 在这两个 loop 设备上创建物理卷, 创建一个名为 github 的卷组，包含这两个物理卷
           sudo truncate -s "${mnt_size}" /mnt/mnt.img
           sudo truncate -s "${root_size}" /root.img
           sudo losetup /dev/loop6 /mnt/mnt.img
