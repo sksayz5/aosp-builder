@@ -109,7 +109,7 @@ jobs:
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Set up JDK
+      - name: Setup JDK
         uses: actions/setup-java@main
         with:
           distribution: 'temurin'
