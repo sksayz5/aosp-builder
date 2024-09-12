@@ -21,7 +21,7 @@ jobs:
         run: |
           echo -e "Current working directory: $(pwd)"
           # 删除docker所有镜像
-          docker rmi $(docker images -q) 2>/dev/null
+          docker rmi $(docker images -q)
           # # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
           # [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           # # 删除指定的目录及其所有内容，忽略所有错误信息
