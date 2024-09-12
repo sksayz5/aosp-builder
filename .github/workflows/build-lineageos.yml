@@ -3,6 +3,12 @@ name: (Dev) Build LineageOS
 on:
   repository_dispatch:
   workflow_dispatch:
+    inputs:
+      manifest-branch:
+        description: 'Manifest branch'
+        required: true
+        default: 'lineage-18.1'
+        type: string
 
 jobs:
   build:
@@ -10,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       path_build: "/android/lineage"
-      manifest-branch: "lineage-18.1"
+      manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
     steps:
       - name: Set environment variable
         id: var
