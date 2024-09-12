@@ -28,7 +28,7 @@ jobs:
           # done
           # 删除所有不再使用的 docker 镜像、容器、网络和数据卷
           docker image prune -a
-          
+
           # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           # 删除指定的目录及其所有内容，忽略所有错误信息
@@ -120,6 +120,8 @@ jobs:
         # if: ${{ 'true' == 'false' }} # disable
         env:
           path_build: /android/lineage
+          mnt_num: 1
+          root_num: 1
         working-directory: /
         run: |
           echo "Current working directory: $(pwd)"
@@ -141,8 +143,8 @@ jobs:
           fi
 
           # 减去缓冲空间：/mnt 和 / 分区分别减去 1GB 和 4GB 作为缓冲
-          mnt_size=$((${mnt_available} - 1 * 1024 * 1024 * 1024))
-          root_size=$((${root_available} - 4 * 1024 * 1024 * 1024))
+          mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * 1024 * 1024 * 1024))
+          root_size=$((${root_available} - ${{ env.root_num }} * 1024 * 1024 * 1024))
           echo "Available space in /mnt (bytes): ${mnt_size}"
           echo "Available space in / (bytes): ${root_size}"
 
