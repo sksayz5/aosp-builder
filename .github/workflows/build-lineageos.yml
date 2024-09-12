@@ -9,8 +9,8 @@ jobs:
     name: Build LineageOS
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
+      # - name: Checkout repository
+      #   uses: actions/checkout@main
 
       - name: Clear environment
         id: clearinit
