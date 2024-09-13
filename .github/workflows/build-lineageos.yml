@@ -253,12 +253,14 @@ jobs:
           export PATH=~/bin:$PATH
 
           # bash ./device/xiaomi/sm6125-common/setup-makefiles.sh
+          set +e
           ls -lh
           ls -lh ./device/
           ls -lh ./vendor/
           ls -lh ./vendor/xiaomi/
           ls -lh ./vendor/xiaomi/sm6125-common/
           ./vendor/xiaomi/sm6125-common/setup-makefiles.sh
+          set -e
 
           source build/envsetup.sh
           breakfast ${{ env.android-version }}
