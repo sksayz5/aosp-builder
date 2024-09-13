@@ -254,6 +254,7 @@ jobs:
 
           # bash ./device/xiaomi/sm6125-common/setup-makefiles.sh
           ls -lh
+          ls -lh ./device/
           ls -lh ./vendor/
           ls -lh ./vendor/xiaomi/
           ls -lh ./vendor/xiaomi/sm6125-common/
