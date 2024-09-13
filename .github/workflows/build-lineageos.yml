@@ -252,10 +252,9 @@ jobs:
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
-          source build/envsetup.sh
-
           bash ./device/xiaomi/sm6125-common/setup-makefiles.sh
-          
+
+          source build/envsetup.sh
           breakfast ${{ env.android-version }}
           croot
           brunch ${{ env.android-version }} -j$(nproc --all)
