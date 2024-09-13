@@ -262,10 +262,15 @@ jobs:
           ./vendor/xiaomi/sm6125-common/setup-makefiles.sh
           set -e
 
+          echo "===== source build/envsetup.sh ====="
           source build/envsetup.sh
+          echo "===== breakfast ${{ env.android-version }} ====="
           breakfast ${{ env.android-version }}
+          echo "===== croot ====="
           croot
+          echo "===== brunch ${{ env.android-version }} -j$(nproc --all) ====="
           brunch ${{ env.android-version }} -j$(nproc --all)
+          
           echo "Build completed"
 
       - name: Upload OpenWrt to Release
