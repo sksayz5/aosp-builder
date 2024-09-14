@@ -272,6 +272,7 @@ jobs:
           export DEVICE=ginkgo
           export VENDOR=xiaomi
           source ./device/xiaomi/sm6125-common/setup-makefiles.sh
+          cat ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk
           set -e
 
           breakfast ${{ env.android-version }}
