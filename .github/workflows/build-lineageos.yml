@@ -265,7 +265,8 @@ jobs:
           ls -lh ./device/
           ls -lh ./device/xiaomi/
           ls -lh ./device/xiaomi/sm6125-common/
-
+          
+          echo "===== $(realpath ./device/xiaomi/sm6125-common/setup-makefiles.sh) ====="
           cat ./device/xiaomi/sm6125-common/setup-makefiles.sh
           export DEVICE_COMMON=sm6125-common
           export DEVICE=ginkgo
