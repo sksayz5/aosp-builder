@@ -270,6 +270,7 @@ jobs:
 
           # bash ./device/xiaomi/sm6125-common/setup-makefiles.sh
           ./vendor/xiaomi/sm6125-common/setup-makefiles.sh
+          ./device/xiaomi/sm6125-common/setup-makefiles.sh
           
           set -e
 
