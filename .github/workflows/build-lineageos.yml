@@ -66,6 +66,8 @@ jobs:
           sudo swapoff -a
           sudo rm -f /swapfile /mnt/swapfile
 
+          snap list
+
           # 删除所有不再需要的软件包及其配置文件, 清理 apt 的缓存
           packages_purge=(
             "azure-cli*"
