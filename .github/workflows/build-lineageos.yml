@@ -75,7 +75,7 @@ jobs:
           for m in /snap/core/*; do
             sudo umount $m
           done
-          sudo apt autoremove --purge snapd
+          sudo apt-get -qq -y autoremove --purge snapd
           sudo rm -rf ~/snap
           sudo rm -rf /snap
           sudo rm -rf /var/snap
