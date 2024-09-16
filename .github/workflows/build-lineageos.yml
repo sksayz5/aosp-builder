@@ -72,9 +72,9 @@ jobs:
           done
           sudo systemctl stop snapd
           sudo systemctl disable --now snapd.socket
-          for m in /snap/core/*; do
-            sudo umount $m
-          done
+          # for m in /snap/core/*; do
+          #   sudo umount $m
+          # done
           sudo apt-get -qq -y autoremove --purge snapd
           sudo rm -rf ~/snap
           sudo rm -rf /snap
