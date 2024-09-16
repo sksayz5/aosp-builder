@@ -72,14 +72,16 @@ jobs:
             "docker*"
             "ghc*"
             "zulu*"
-            "llvm*"
-            "firefox*"
             "google*"
+            "firefox*"
             "dotnet*"
             "powershell*"
             "openjdk*"
             "mongodb*"
             "moby*"
+          )
+          packages_abandon=(
+            "llvm*"
           )
           sudo -E apt-get -qq -y update
           sudo -E apt-get -qq -y purge "${packages_purge[@]}" || true
