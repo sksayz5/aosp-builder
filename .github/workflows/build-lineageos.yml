@@ -14,6 +14,14 @@ on:
         required: true
         default: "ginkgo"
         type: string
+      custom_env:
+        description: "key=value;key=value"
+        type: string
+        required: false
+        default: ""
+
+env:
+  custom_env: ${{ inputs.custom_env || '' }}
 
 jobs:
   build:
@@ -26,6 +34,7 @@ jobs:
     steps:
       - name: Set environment variable
         id: var
+        if: ${{ 'true' == 'false' }} # disable
         working-directory: /
         run: |
           echo -e "Current working directory: $(pwd)"
@@ -41,6 +50,15 @@ jobs:
           done
 
           echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Load Custom Environment Variables
+        id: env-custom
+        if: ${{ env.custom_env != '' }}
+        env:
+          flag_split: ";"
+        working-directory: /
+        run: |
+          echo "${{ env.custom_env }}" | tr '${{ env.flag_split }}' '\n' | tee -a $GITHUB_ENV
 
       - name: Clear environment
         id: clearinit
