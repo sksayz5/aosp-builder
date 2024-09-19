@@ -381,6 +381,7 @@ jobs:
         run: |
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
+          repo sync --help
 
           repo sync \
             --current-branch \
