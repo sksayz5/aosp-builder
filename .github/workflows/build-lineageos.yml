@@ -397,13 +397,11 @@ jobs:
           echo "===== breakfast ${{ env.android-version }} ====="
           set +e
           breakfast ${{ env.android-version }}
-          ls -lh
-          ls -lh ./vendor/
-          # ls -lh ./vendor/xiaomi/
-          # ls -lh ./vendor/xiaomi/sm6125-common/
-          ls -lh ./device/
-          ls -lh ./device/xiaomi/
-          ls -lh ./device/xiaomi/sm6125-common/
+          # ls -lh
+          # ls -lh ./vendor/
+          # ls -lh ./device/
+          # ls -lh ./device/xiaomi/
+          # ls -lh ./device/xiaomi/sm6125-common/
 
           echo "===== ./device/xiaomi/sm6125-common/setup-makefiles.sh ====="
           cat ./device/xiaomi/sm6125-common/setup-makefiles.sh
