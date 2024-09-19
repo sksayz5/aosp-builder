@@ -358,8 +358,7 @@ jobs:
           # if [ -d "$HOME/bin" ] ; then
           #   export PATH="$HOME/bin:$PATH"
           # fi
-          export PATH=~/bin:$PATH
-          repo sync help
+          # export PATH=~/bin:$PATH
 
       - name: Initialize LineageOS source
         working-directory: ${{ env.path_build }}
