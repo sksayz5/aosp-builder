@@ -380,7 +380,14 @@ jobs:
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
-          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --depth=1
+          repo sync -c -j$(nproc --all) \
+            --force-sync \
+            --no-clone-bundle \
+            --no-tags \
+            --depth=1 \
+            --git-lfs \
+            --verbose
+
           df -Th
           echo "Source code synced"
 
