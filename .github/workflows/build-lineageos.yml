@@ -365,6 +365,7 @@ jobs:
         run: |
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
+          export REPO_ALLOW_SHALLOW=1
 
           repo init \
             --manifest-url https://github.com/LineageOS/android.git \
@@ -383,6 +384,7 @@ jobs:
         run: |
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
+          export REPO_ALLOW_SHALLOW=1
           repo sync --help
 
           # repo sync -c -n -j 4 && repo sync -c -l -j 16
