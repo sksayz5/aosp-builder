@@ -385,16 +385,16 @@ jobs:
           export PATH=~/bin:$PATH
           repo sync --help
 
+          # repo sync -c -n -j 4 && repo sync -c -l -j 16
           repo sync \
             --current-branch \
             --no-clone-bundle \
             --no-tags \
             --verbose \
             --optimized-fetch \
+            --prune \
+            --auto-gc \
             -j$(nproc --all)
-          # --force-sync \
-          # --depth=1 \
-          # --git-lfs \
 
           df -Th
           echo "Source code synced"
