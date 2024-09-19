@@ -359,7 +359,7 @@ jobs:
           #   export PATH="$HOME/bin:$PATH"
           # fi
           export PATH=~/bin:$PATH
-          repo help sync
+          repo sync help
 
       - name: Initialize LineageOS source
         working-directory: ${{ env.path_build }}
