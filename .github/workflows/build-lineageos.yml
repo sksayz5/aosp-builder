@@ -366,8 +366,10 @@ jobs:
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
-          repo init -u https://github.com/LineageOS/android.git \
+          repo init \
+            --manifest-url https://github.com/LineageOS/android.git \
             --manifest-branch ${{ env.manifest-branch }} \
+            --no-clone-bundle \
             --depth=1 \
             --git-lfs \
             --verbose
