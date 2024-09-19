@@ -354,9 +354,12 @@ jobs:
           mkdir -p ~/bin
           curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
           chmod a+rx ~/bin/repo
+
           # if [ -d "$HOME/bin" ] ; then
           #   export PATH="$HOME/bin:$PATH"
           # fi
+          export PATH=~/bin:$PATH
+          repo help sync
 
       - name: Initialize LineageOS source
         working-directory: ${{ env.path_build }}
