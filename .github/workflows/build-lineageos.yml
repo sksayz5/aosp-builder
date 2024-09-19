@@ -384,11 +384,11 @@ jobs:
             --current-branch \
             --no-clone-bundle \
             --no-tags \
-            --git-lfs \
             --verbose \
             -j$(nproc --all)
           # --force-sync \
           # --depth=1 \
+          # --git-lfs \
 
           df -Th
           echo "Source code synced"
