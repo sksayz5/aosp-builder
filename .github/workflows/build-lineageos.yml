@@ -385,6 +385,7 @@ jobs:
             --no-clone-bundle \
             --no-tags \
             --verbose \
+            --optimized-fetch \
             -j$(nproc --all)
           # --force-sync \
           # --depth=1 \
