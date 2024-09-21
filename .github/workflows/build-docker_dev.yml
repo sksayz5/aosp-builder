@@ -24,7 +24,7 @@ env:
   app_branch: ${{ inputs.app_branch }}
   tag_repo: ${{ inputs.tag_repo || 'latest' }}
   dir_app: "docker/${{ inputs.app_branch }}"
-  ompress: "true"
+  compress: "true"
   custom_env: ${{ inputs.custom_env || '' }}
 
 jobs:
