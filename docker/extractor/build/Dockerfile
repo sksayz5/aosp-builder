@@ -1,7 +1,7 @@
 ############################################################
-# base on Ubuntu
-# custom_env: 
-#    build_arg='repo_device=https://github.com/LineageOS/android_device_'
+# base on Debian/Ubuntu
+# custom_env example: 
+#    build_arg='repo_device=https://github.com/LineageOS/android_device_xiaomi_sm6125-common'
 ############################################################
 
 ARG base_image=ubuntu:devel
@@ -78,9 +78,9 @@ RUN set -x \
     # ----- device repository -----
     && dir_device="/device" \
     && mkdir -p ${dir_device} \
-    # && if [ -n "${repo_device}" ] ; then \
-    #     git clone ${repo_device} ${dir_device} --single-branch --depth=1; \
-    # fi; \
+    && if [ -n "${repo_device}" ] ; then \
+        git clone ${repo_device} ${dir_device} --single-branch --depth=1; \
+    fi \
     # ===== docker-entrypoint.sh =====
     && sh_entrypoint="/docker-entrypoint.sh" \
     && echo "#!/usr/bin/env bash" >> ${sh_entrypoint} \
