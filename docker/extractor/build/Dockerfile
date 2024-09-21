@@ -66,13 +66,19 @@ RUN set -x \
 	&& unset DEBIAN_FRONTEND \
     # ===== fix /dev/shm =====
     && chmod +x /dev/shm \
-    # ===== sdat2img.py =====
-    && dir_sdat2img="/sdat2img" \
-    && mkdir -p ${dir_sdat2img} \
-    && git clone "https://github.com/xpirt/sdat2img" ${dir_sdat2img} --single-branch --depth=1 --branch=master \
     # ===== android =====
     && dir_android="/android" \
     && mkdir -p ${dir_android} \
+    # ----- sdat2img.py -----
+    && dir_sdat2img="/sdat2img" \
+    && mkdir -p ${dir_sdat2img} \
+    && git clone "https://github.com/xpirt/sdat2img" ${dir_sdat2img} --single-branch --depth=1 --branch=master \
+    # ----- device repository -----
+    && dir_device="/device" \
+    && mkdir -p ${dir_device} \
+    && if [ -n "${repo_device}" ] ; then \
+        git clone ${repo_device} ${dir_device} --single-branch --depth=1 \
+    fi; \
     # ===== docker-entrypoint.sh =====
     && sh_entrypoint="/docker-entrypoint.sh" \
     && echo "#!/usr/bin/env bash" >> ${sh_entrypoint} \
