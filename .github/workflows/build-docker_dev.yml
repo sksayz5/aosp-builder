@@ -24,6 +24,7 @@ env:
   app_branch: ${{ inputs.app_branch }}
   tag_repo: ${{ inputs.tag_repo || 'latest' }}
   dir_app: "docker/${{ inputs.app_branch }}"
+  ompress: "true"
   custom_env: ${{ inputs.custom_env || '' }}
 
 jobs:
@@ -490,3 +491,10 @@ jobs:
           replacesArtifacts: true
           token: "${{ secrets.GITHUB_TOKEN }}"
           bodyFile: "${{ env.release_md }}"
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@main
+        with:
+          name: docker-image
+          path: "${{ env.dir_output }}/*.${{ env.target_ext }}"
+      
