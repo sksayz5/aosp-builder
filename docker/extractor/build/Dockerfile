@@ -5,7 +5,21 @@
 ARG base_image=ubuntu:devel
 FROM ${base_image}
 
+ARG build_arg="" \
+    flag_split=","
 RUN set -x \
+    # ===== Set environment variable =====
+    && export build_arg=$(echo "${build_arg}" | sed 's|^[\"]*||;s|[\"]*$||' | sed "s|^[\']*||;s|[\']*$||") \
+    && echo "${build_arg}" \
+    && echo "${build_arg}" | tr "${flag_split}" '\n' | while IFS='=' read -r key value; do \
+        if [ -n "$key" ] && [ -n "$value" ]; then \
+            echo "$key=$value" >> /etc/environment; \
+        fi; \
+    done \
+    && set -a \
+    && . /etc/environment \
+    && set +a \
+    && printenv \
     # ===== apt dependencies =====
 	&& export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update --ignore-missing -y -qq \
