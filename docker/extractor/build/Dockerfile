@@ -79,7 +79,7 @@ RUN set -x \
     && dir_device="/device" \
     && mkdir -p ${dir_device} \
     && if [ -n "${repo_device}" ] ; then \
-        git clone ${repo_device} ${dir_device} --single-branch --depth=1 \
+        git clone ${repo_device} ${dir_device} --single-branch --depth=1; \
     fi; \
     # ===== docker-entrypoint.sh =====
     && sh_entrypoint="/docker-entrypoint.sh" \
