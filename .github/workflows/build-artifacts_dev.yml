@@ -495,6 +495,6 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@main
         with:
-          name: docker-image
+          name: "${{ env.app_branch }}"
           path: "${{ env.dir_output }}/*.${{ env.target_ext }}"
       
