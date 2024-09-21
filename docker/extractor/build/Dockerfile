@@ -1,5 +1,6 @@
 ############################################################
 # base on Ubuntu
+# custom_env: build_arg='repo_device=https://github.com/LineageOS/android_device_xxx'
 ############################################################
 
 ARG base_image=ubuntu:devel
@@ -89,3 +90,4 @@ RUN set -x \
 WORKDIR "/sdat2img"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
