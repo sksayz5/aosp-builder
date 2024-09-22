@@ -58,6 +58,7 @@ RUN set -x \
         sudo \
         brotli \
         unzip \
+        p7zip-full \
     # ===== List upgradable =====
     && apt list --upgradable \
     # ===== Clean apt =====
@@ -88,6 +89,6 @@ RUN set -x \
 	&& echo "sleep infinity" >> ${sh_entrypoint} \
 	&& chmod +x ${sh_entrypoint}
 
-WORKDIR "/sdat2img"
+# WORKDIR "/sdat2img"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
