@@ -250,4 +250,17 @@ jobs:
 
           df -Th
           echo "status=success" >> "${GITHUB_OUTPUT}"
+
+      - name: Check Apt List
+        id: apt-list
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          apt list --installed
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
           
