@@ -296,6 +296,9 @@ jobs:
             "/usr/local/share/"
             "/usr/share/"
             "/usr/local/lib/android/sdk/"
+            "/usr/local/lib/android/sdk/build-tools/"
+            "/usr/local/lib/android/sdk/platforms/"
+            "/usr/local/lib/android/sdk/ndk/"
           )
           for dir in "${dir_extra[@]}"; do
             echo "listing: ${dir}"
