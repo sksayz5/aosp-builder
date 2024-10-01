@@ -68,6 +68,8 @@ jobs:
         run: |
           echo -e "Current working directory: $(pwd)"
 
+          sudo -E apt-get -qq -y update
+
           # ===== Remove snap =====
           for p in $(snap list | awk '{print $1}'); do
             sudo snap remove $p
@@ -85,6 +87,23 @@ jobs:
           Pin: release a=*
           Pin-Priority: -10
           EOF'
+          sudo -E systemctl daemon-reload
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Clean Runner
+        id: clean-runner
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          sudo -E apt-get -qq -y update
+          # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
+
+          sudo update-alternatives --display g++
+          
           sudo -E systemctl daemon-reload
 
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -137,8 +156,8 @@ jobs:
           sudo -E apt-get -qq -y autoremove --purge
           sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
-          apt list --installed
-          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
+          # apt list --installed
+          # dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
 
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -203,6 +222,24 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
+      - name: Clean Apt
+        id: clean-apt
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          apt list --installed
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
+
+          apt-get autoremove --purge -y -qq
+          apt-get clean -y -qq
+          rm -rf /var/lib/apt/lists/*
+          rm -rf /var/log/*.log
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
       - name: Create simulated physical disk
         id: disk
         env:
@@ -250,17 +287,3 @@ jobs:
 
           df -Th
           echo "status=success" >> "${GITHUB_OUTPUT}"
-
-      - name: Check Apt List
-        id: apt-list
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        working-directory: /
-        run: |
-          echo -e "Current working directory: $(pwd)"
-
-          apt list --installed
-          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
-
-          echo "status=success" >> ${GITHUB_OUTPUT}
-          
