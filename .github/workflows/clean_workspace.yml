@@ -192,7 +192,7 @@ jobs:
           sudo -E rm -rf /usr/local/share/chromium
           sudo -E rm -rf /usr/local/share/edge_driver
           sudo -E rm -rf /usr/local/share/gecko_driver
-          
+
           # ===== Clean PowerShell Tools =====
           sudo -E rm -rf /usr/local/share/powershell
 
@@ -289,13 +289,16 @@ jobs:
           apt list --installed
           dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
 
-          # ----- check extra packages -----
-          echo "listing: /usr/local/share/"
-          ls -lh /usr/local/share/
-          du -h --max-depth=1 /usr/local/share/
-          echo "listing: /usr/share/"
-          ls -lh /usr/share/java
-          du -h --max-depth=1 /usr/share/java
+          # ----- check extra dir -----
+          dir_extra=(
+            "/usr/local/share"
+            "/usr/share/"
+          )
+          for dir in "${dir_extra[@]}"; do
+            echo "listing: ${dir}"
+            du -h --max-depth=1 ${dir}
+            ls -lh ${dir}
+          done
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
