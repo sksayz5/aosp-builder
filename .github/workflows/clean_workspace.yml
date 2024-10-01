@@ -121,7 +121,6 @@ jobs:
             "firefox*"
             "dotnet*"
             "powershell*"
-            "openjdk*"
             "mongodb*"
             "moby*"
             "mysql*"
@@ -186,10 +185,6 @@ jobs:
           )
           echo "Packages to be installed: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
-
-          # ----- check extra packages -----
-          ls -lh /usr/local/share/
-          ls -lh /usr/share/
 
           # ===== Clean Swap =====
           # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
@@ -268,21 +263,27 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Check Apt
-        id: check-apt
+      - name: Check Installed
+        id: check-installed
         env:
           DEBIAN_FRONTEND: noninteractive
         working-directory: /
         run: |
           echo -e "Current working directory: $(pwd)"
 
-          apt list --installed
-          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
-
           sudo -E apt-get autoremove --purge -y -qq
           sudo -E apt-get clean -y -qq
           # sudo -E rm -rf /var/lib/apt/lists/*
           # sudo -E rm -rf /var/log/*.log
+
+          apt list --installed
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
+
+          # ----- check extra packages -----
+          echo "listing: /usr/local/share/"
+          ls -lh /usr/local/share/
+          echo "listing: /usr/share/"
+          ls -lh /usr/share/
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
