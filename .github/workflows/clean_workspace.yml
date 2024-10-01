@@ -131,9 +131,9 @@ jobs:
           for package in "${packages_purge[@]}"; do
             echo "Attempting to remove $package..."
             if sudo apt-get -qq -y remove "$package"; then
-              echo "$package removed successfully."
+              echo "Successfully remove: $package"
             else
-              echo "Failed to remove $package, skipping."
+              echo "Failed to remove: $package"
             fi
           done
           set -e
