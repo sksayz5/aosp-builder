@@ -110,6 +110,8 @@ jobs:
             "g++-[0-9]+.*"
             "cpp-[0-9]+.*"
             "libstdc++-[0-9]+.*"
+            "gfortran-[0-9]+.*"
+            "libgfortran-[0-9]+.*"
           )
           packages_purge=()
           for regex in "${regexes[@]}"; do
@@ -119,10 +121,10 @@ jobs:
               fi
             done
           done
-          echo "Packages to be purged: ${packages_purge[@]}"
 
-          # sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
+          echo "Packages to be purged: ${packages_purge[@]}"
           set +e
+          # sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
           for package in "${packages_purge[@]}"; do
             echo "Attempting to remove $package..."
             if sudo apt-get -qq -y remove "$package"; then
@@ -136,12 +138,14 @@ jobs:
           # ----- package for install -----
           packages_install=(
             "gcc"
-            "libgcc"
+            "libgcc-13-dev"
             "g++"
             "cpp"
-            "libstdc++"
+            "libstdc++-13-dev"
+            "gfortran"
+            "libgfortran-13-dev"
           )
-          echo "Packages to be purged: ${packages_install[@]}"
+          echo "Packages to be installed: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
 
           # ----- reload -----
