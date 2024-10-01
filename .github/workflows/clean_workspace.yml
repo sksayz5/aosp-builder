@@ -268,8 +268,8 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Clean Apt
-        id: clean-apt
+      - name: Check Apt
+        id: check-apt
         env:
           DEBIAN_FRONTEND: noninteractive
         working-directory: /
