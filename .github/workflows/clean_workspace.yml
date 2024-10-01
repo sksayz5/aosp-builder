@@ -124,7 +124,6 @@ jobs:
 
           echo "Packages to be purged: ${packages_purge[@]}"
           set +e
-          # sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
           for package in "${packages_purge[@]}"; do
             echo "Attempting to remove $package..."
             if sudo apt-get -qq -y remove "$package"; then
