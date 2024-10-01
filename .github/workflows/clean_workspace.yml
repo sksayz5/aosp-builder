@@ -278,10 +278,10 @@ jobs:
           apt list --installed
           dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
 
-          # apt-get autoremove --purge -y -qq
-          apt-get clean -y -qq
-          # rm -rf /var/lib/apt/lists/*
-          # rm -rf /var/log/*.log
+          sudo -E apt-get autoremove --purge -y -qq
+          sudo -E apt-get clean -y -qq
+          # sudo -E rm -rf /var/lib/apt/lists/*
+          # sudo -E rm -rf /var/log/*.log
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
