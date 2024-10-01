@@ -111,7 +111,8 @@ jobs:
           sudo -E apt-get -qq -y update
           installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
           
-          # ===== regex for uninstall =====
+          # ===== Clean Apt =====
+          # ----- package for uninstall -----
           regexes=(
             # ----- Language and Runtime -----
             "clang-[0-9]+.*"
@@ -140,14 +141,14 @@ jobs:
           set +e
           for package in "${packages_purge[@]}"; do
             echo "Attempting to remove $package"
-            sudo -E apt-get -qq -y autoremove --purge
+            sudo -E apt-get -qq -y autoremove --purge $package
             if [[ $? -ne 0 ]]; then
               echo "Failed to remove $package"
             fi
           done
           set -e
 
-          # ===== package for install =====
+          # ----- package for install -----
           packages_install=(
             # ----- Language and Runtime -----
             "clang"
@@ -166,7 +167,7 @@ jobs:
           echo "Packages to be installed: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
 
-          # ===== check extra packages =====
+          # ----- check extra packages -----
           ls -lh /usr/local/share/
           ls -lh /usr/share/
 
