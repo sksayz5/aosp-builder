@@ -117,6 +117,8 @@ jobs:
             "libstdc++-[0-9]+.*"
             "gfortran-[0-9]+.*"
             "libgfortran-[0-9]+.*"
+            # ----- Java -----
+            "temurin-[0-9]+-jdk"
           )
           packages_purge=()
           for regex in "${regexes[@]}"; do
@@ -152,6 +154,7 @@ jobs:
             "libstdc++-13-dev"
             "gfortran"
             "libgfortran-13-dev"
+            # ----- Java -----
           )
           echo "Packages to be installed: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
