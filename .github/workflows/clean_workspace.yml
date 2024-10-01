@@ -100,16 +100,28 @@ jobs:
           echo -e "Current working directory: $(pwd)"
 
           sudo -E apt-get -qq -y update
+          installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
           # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
 
-          # ----- Re-intall GNU C++ -----
-          packages_purge=(
-            "gcc-\d+*"
-            "libgcc-\d+*"
-            "g++-\d+*"
-            "cpp-\d+*"
-            "libstdc++-\d+*"
+          # ===== Re-intall GNU C++ =====
+          # ----- regex for uninstall -----
+          regexes=(
+            "gcc-[0-9]+.*"
+            "libgcc-[0-9]+.*"
+            "g++-[0-9]+.*"
+            "cpp-[0-9]+.*"
+            "libstdc++-[0-9]+.*"
           )
+          packages_purge=()
+          for regex in "${regexes[@]}"; do
+            for package in $installed_packages; do
+              if [[ $package =~ $regex ]]; then
+                  packages_purge+=("$package")
+              fi
+            done
+          done
+          echo "Packages to be purged: ${packages_purge[@]}"
+          # ----- package for install -----
           packages_install=(
             "gcc"
             "libgcc"
@@ -117,6 +129,7 @@ jobs:
             "cpp"
             "libstdc++"
           )
+          # ===== Execute =====
           sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
           sudo -E systemctl daemon-reload
