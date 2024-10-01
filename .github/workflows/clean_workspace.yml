@@ -104,7 +104,6 @@ jobs:
           installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
           held_packages=$(dpkg --get-selections | grep hold | awk '{print $1}')
 
-          # ===== Re-intall GNU C++ =====
           # ----- regex for uninstall -----
           regexes=(
             "gcc-[0-9]+.*"
@@ -127,6 +126,18 @@ jobs:
             done
           done
           echo "Packages to be purged: ${packages_purge[@]}"
+          # sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
+          set +e
+          for package in "${packages_purge[@]}"; do
+            echo "Attempting to remove $package..."
+            if sudo apt-get -qq -y remove "$package"; then
+              echo "$package removed successfully."
+            else
+              echo "Failed to remove $package, skipping."
+            fi
+          done
+          set -e
+
           # ----- package for install -----
           packages_install=(
             "gcc"
@@ -135,8 +146,6 @@ jobs:
             "cpp"
             "libstdc++"
           )
-          # ===== Execute =====
-          sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
           sudo -E systemctl daemon-reload
 
