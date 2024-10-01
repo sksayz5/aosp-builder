@@ -112,7 +112,28 @@ jobs:
           installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
           
           # ===== Clean Apt =====
-          # ----- package for uninstall -----
+          # ----- package for purge -----
+          packages_purge=(
+            "docker*"
+            "ghc*"
+            "zulu*"
+            "google*"
+            "firefox*"
+            "dotnet*"
+            "powershell*"
+            "openjdk*"
+            "mongodb*"
+            "moby*"
+            "mysql*"
+            "postgresql*"
+            "sqlite3*"
+            "apache2*"
+            "nginx*"
+            "php*"
+          )
+          sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
+
+          # ----- package for re-install -----
           regexes=(
             # ----- Language and Runtime -----
             "clang-[0-9]+.*"
@@ -148,7 +169,6 @@ jobs:
           done
           set -e
 
-          # ----- package for install -----
           packages_install=(
             # ----- Language and Runtime -----
             "clang"
@@ -170,26 +190,6 @@ jobs:
           # ----- check extra packages -----
           ls -lh /usr/local/share/
           ls -lh /usr/share/
-
-          packages_purge=(
-            "docker*"
-            "ghc*"
-            "zulu*"
-            "google*"
-            "firefox*"
-            "dotnet*"
-            "powershell*"
-            "openjdk*"
-            "mongodb*"
-            "moby*"
-            "mysql*"
-            "postgresql*"
-            "sqlite3*"
-            "apache2*"
-            "nginx*"
-            "php*"
-          )
-          sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
 
           # ===== Clean Swap =====
           # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
