@@ -167,7 +167,7 @@ jobs:
           #   docker rmi -f $image
           # done
           # 删除所有不再使用的 docker 镜像、容器、网络和数据卷
-          docker image prune -a
+          docker image prune -a -f
 
           # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
@@ -278,10 +278,10 @@ jobs:
           apt list --installed
           dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
 
-          apt-get autoremove --purge -y -qq
+          # apt-get autoremove --purge -y -qq
           apt-get clean -y -qq
-          rm -rf /var/lib/apt/lists/*
-          rm -rf /var/log/*.log
+          # rm -rf /var/lib/apt/lists/*
+          # rm -rf /var/log/*.log
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
