@@ -4,16 +4,16 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      manifest-branch:
-        description: "Manifest branch"
-        required: true
-        default: "lineage-18.1"
-        type: string
-      android-version:
-        description: "Android version"
-        required: true
-        default: "ginkgo"
-        type: string
+      # manifest-branch:
+      #   description: "Manifest branch"
+      #   required: true
+      #   default: "lineage-18.1"
+      #   type: string
+      # android-version:
+      #   description: "Android version"
+      #   required: true
+      #   default: "ginkgo"
+      #   type: string
       custom_env:
         description: "key=value;key=value"
         type: string
