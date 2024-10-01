@@ -69,6 +69,7 @@ jobs:
           echo -e "Current working directory: $(pwd)"
 
           sudo -E apt-get -qq -y update
+          sudo snap list
 
           # ===== Remove snap =====
           for p in $(snap list | awk '{print $1}'); do
@@ -99,10 +100,16 @@ jobs:
         run: |
           echo -e "Current working directory: $(pwd)"
 
+          # ===== Clean Docker =====
+          docker image list
+          # for image in $(docker images -q); do
+          #   docker rmi -f $image
+          # done
+          docker image prune -a -f
+
           # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
           sudo -E apt-get -qq -y update
           installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
-
           
           # ===== regex for uninstall =====
           regexes=(
@@ -132,11 +139,10 @@ jobs:
           echo "Packages to be purged: ${packages_purge[@]}"
           set +e
           for package in "${packages_purge[@]}"; do
-            echo "Attempting to remove $package..."
-            if sudo apt-get -qq -y remove "$package"; then
-              echo "Successfully remove: $package"
-            else
-              echo "Failed to remove: $package"
+            echo "Attempting to remove $package"
+            sudo -E apt-get -qq -y autoremove --purge
+            if [[ $? -ne 0 ]]; then
+              echo "Failed to remove $package"
             fi
           done
           set -e
@@ -164,36 +170,6 @@ jobs:
           ls -lh /usr/local/share/
           ls -lh /usr/share/
 
-          # ----- reload -----
-          sudo -E systemctl daemon-reload
-
-          echo "status=success" >> ${GITHUB_OUTPUT}
-
-      - name: Clean environment
-        id: clean-init
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        working-directory: /
-        run: |
-          echo -e "Current working directory: $(pwd)"
-
-          docker image list
-          # 删除docker所有镜像
-          # for image in $(docker images -q); do
-          #   docker rmi -f $image
-          # done
-          # 删除所有不再使用的 docker 镜像、容器、网络和数据卷
-          docker image prune -a -f
-
-          # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
-          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
-          # 删除指定的目录及其所有内容，忽略所有错误信息
-          # sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
-          # 关闭所有交换空间 删除指定的交换文件
-          sudo swapoff -a
-          sudo rm -f /swapfile /mnt/swapfile
-
-          # ===== Clean apt =====
           packages_purge=(
             "docker*"
             "ghc*"
@@ -212,12 +188,22 @@ jobs:
             "nginx*"
             "php*"
           )
-          sudo -E apt-get -qq -y update
-          sudo -E apt-get -qq -y purge "${packages_purge[@]}"
+          sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
+
+          # ===== Clean Swap =====
+          # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
+          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+          # 删除指定的目录及其所有内容，忽略所有错误信息
+          # sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
+          # 关闭所有交换空间 删除指定的交换文件
+          sudo swapoff -a
+          sudo rm -f /swapfile /mnt/swapfile
+
+          # ===== reload =====
           sudo -E apt-get -qq -y autoremove --purge
           sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
-
+          
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
