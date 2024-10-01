@@ -278,8 +278,8 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Check Installed
-        id: check-installed
+      - name: Check Workspace
+        id: check-workspace
         env:
           DEBIAN_FRONTEND: noninteractive
         working-directory: /
