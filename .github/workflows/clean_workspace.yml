@@ -121,6 +121,7 @@ jobs:
             "firefox*"
             "dotnet*"
             "powershell*"
+            "microsoft-edge*"
             # Databases
             "sqlite*"
             "postgresql*"
