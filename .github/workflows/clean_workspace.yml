@@ -102,7 +102,7 @@ jobs:
           # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
           sudo -E apt-get -qq -y update
           installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
-          sudo apt-mark showhold
+          held_packages=$(dpkg --get-selections | grep hold | awk '{print $1}')
 
           # ===== Re-intall GNU C++ =====
           # ----- regex for uninstall -----
@@ -117,7 +117,12 @@ jobs:
           for regex in "${regexes[@]}"; do
             for package in $installed_packages; do
               if [[ $package =~ $regex ]]; then
+                # 检查是否在held_packages中
+                if ! echo "$held_packages" | grep -q "$package"; then
                   packages_purge+=("$package")
+                else
+                  echo "Skipping held package: $package"
+                fi
               fi
             done
           done
