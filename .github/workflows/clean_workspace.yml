@@ -120,7 +120,7 @@ jobs:
             done
           done
           echo "Packages to be purged: ${packages_purge[@]}"
-          
+
           # sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
           set +e
           for package in "${packages_purge[@]}"; do
@@ -141,7 +141,10 @@ jobs:
             "cpp"
             "libstdc++"
           )
+          echo "Packages to be purged: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
+
+          # ----- reload -----
           sudo -E systemctl daemon-reload
 
           echo "status=success" >> ${GITHUB_OUTPUT}
