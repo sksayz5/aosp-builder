@@ -286,8 +286,10 @@ jobs:
           # ----- check extra packages -----
           echo "listing: /usr/local/share/"
           ls -lh /usr/local/share/
+          du -h --max-depth=1 /usr/local/share/
           echo "listing: /usr/share/"
           ls -lh /usr/share/java
+          du -h --max-depth=1 /usr/share/java
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
