@@ -96,6 +96,8 @@ jobs:
         id: clean-runner
         env:
           DEBIAN_FRONTEND: noninteractive
+          VERSION_GCC: "13"
+          VERSION_JDK: "21"
         working-directory: /
         run: |
           echo -e "Current working directory: $(pwd)"
@@ -176,14 +178,14 @@ jobs:
             "clang-format"
             "clang-tidy"
             "gcc"
-            "libgcc-13-dev"
+            "libgcc-${{ env.VERSION_GCC }}-dev"
             "g++"
             "cpp"
-            "libstdc++-13-dev"
+            "libstdc++-${{ env.VERSION_GCC }}-dev"
             "gfortran"
-            "libgfortran-13-dev"
+            "libgfortran-${{ env.VERSION_GCC }}-dev"
             # ----- Java -----
-            "openjdk-21-jdk"
+            "openjdk-${{ env.VERSION_JDK }}-jdk"
           )
           echo "Packages to be installed: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
@@ -198,11 +200,12 @@ jobs:
           # ===== Clean PowerShell Tools =====
           sudo -E rm -rf /usr/local/share/powershell
 
+          # ===== Clean Android Tools =====
+          sudo find /usr/local/lib/android/sdk/ndk/ -type d -regex '.*/2[0-6].*' -exec rm -rf {} +
+
           # ===== Clean Swap =====
           # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
-          # 删除指定的目录及其所有内容，忽略所有错误信息
-          # sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
           # 关闭所有交换空间 删除指定的交换文件
           sudo swapoff -a
           sudo rm -f /swapfile /mnt/swapfile
@@ -370,8 +373,8 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Check Installed
-        id: check-installed
+      - name: Check Workspace
+        id: check-workspace
         env:
           DEBIAN_FRONTEND: noninteractive
         working-directory: /
@@ -388,8 +391,12 @@ jobs:
 
           # ----- check extra dir -----
           dir_extra=(
-            "/usr/local/share"
+            "/usr/local/share/"
             "/usr/share/"
+            "/usr/local/lib/android/sdk/"
+            "/usr/local/lib/android/sdk/build-tools/"
+            "/usr/local/lib/android/sdk/platforms/"
+            "/usr/local/lib/android/sdk/ndk/"
           )
           for dir in "${dir_extra[@]}"; do
             echo "listing: ${dir}"
@@ -403,8 +410,8 @@ jobs:
         id: disk
         env:
           path_build: ${{ env.path_build }}
-          mnt_num: 1
           root_num: 4
+          mnt_num: 1
         working-directory: /
         run: |
           echo "Current working directory: $(pwd)"
@@ -417,25 +424,28 @@ jobs:
 
           # 减去缓冲空间：/mnt 和 / 分区分别减去缓冲
           gb2bytes=$((1024 * 1024 * 1024))
-          mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * ${gb2bytes} ))
-          root_size=$((${root_available} - ${{ env.root_num }} * ${gb2bytes} ))
+          mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * ${gb2bytes}))
+          root_size=$((${root_available} - ${{ env.root_num }} * ${gb2bytes}))
           echo "Available space in /mnt (bytes): ${mnt_size}"
           echo "Available space in / (bytes): ${root_size}"
 
-          # 使用 LVM 创建物理卷、卷组和逻辑卷
-          # sudo pvcreate /dev/loop6
-          # sudo vgcreate github /dev/loop6
-
-          # 使用 LVM 创建物理卷、卷组和逻辑卷，将文件关联到 loop 设备, 在这两个 loop 设备上创建物理卷, 创建一个名为 github 的卷组，包含这两个物理卷
+          # 创建磁盘映像文件
           sudo truncate -s "${mnt_size}" /mnt/mnt.img
           sudo truncate -s "${root_size}" /root.img
-          sudo losetup /dev/loop6 /mnt/mnt.img
-          sudo losetup /dev/loop7 /root.img
-          sudo pvcreate /dev/loop6
-          sudo pvcreate /dev/loop7
-          sudo vgcreate github /dev/loop6 /dev/loop7
 
-          # 在 github 卷组上创建一个名为 runner 的逻辑卷，使用所有可用空间, 在 runner 逻辑卷上创建一个 XFS 文件系统
+          # 动态分配可用的循环设备
+          LOOP_MNT=$(sudo losetup --find --show /mnt/mnt.img)
+          LOOP_ROOT=$(sudo losetup --find --show /root.img)
+          echo "Assigned loop device for /mnt/mnt.img: ${LOOP_MNT}"
+          echo "Assigned loop device for /root.img: ${LOOP_ROOT}"
+
+          # 创建物理卷
+          sudo pvcreate "${LOOP_MNT}"
+          sudo pvcreate "${LOOP_ROOT}"
+          # 创建卷组
+          sudo vgcreate github "${LOOP_MNT}" "${LOOP_ROOT}"
+
+          # 在 github 卷组上创建一个名为 runner 的逻辑卷，使用所有可用空间, 并格式化为XFS文件系统
           sudo lvcreate -n runner -l 100%FREE github
           sudo mkfs.xfs /dev/github/runner
 
