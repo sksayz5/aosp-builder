@@ -188,7 +188,13 @@ jobs:
           sudo -E apt-get -qq -y install "${packages_install[@]}"
 
           # ===== Clean Browsers and Drivers =====
+          sudo -E rm -rf /usr/local/share/chromedriver-linux64
           sudo -E rm -rf /usr/local/share/chromium
+          sudo -E rm -rf /usr/local/share/edge_driver
+          sudo -E rm -rf /usr/local/share/gecko_driver
+          
+          # ===== Clean PowerShell Tools =====
+          sudo -E rm -rf /usr/local/share/powershell
 
           # ===== Clean Swap =====
           # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
