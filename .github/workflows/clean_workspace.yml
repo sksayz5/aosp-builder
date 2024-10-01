@@ -160,6 +160,10 @@ jobs:
           echo "Packages to be installed: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
 
+          # ===== check extra packages =====
+          ls -lh /usr/local/share/
+          ls -lh /usr/share/
+
           # ----- reload -----
           sudo -E systemctl daemon-reload
 
