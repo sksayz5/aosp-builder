@@ -102,8 +102,23 @@ jobs:
           sudo -E apt-get -qq -y update
           # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
 
-          sudo update-alternatives --display g++
-          
+          # ----- Re-intall GNU C++ -----
+          packages_purge=(
+            "gcc-\d+*"
+            "libgcc-\d+*"
+            "g++-\d+*"
+            "cpp-\d+*"
+            "libstdc++-\d+*"
+          )
+          packages_install=(
+            "gcc"
+            "libgcc"
+            "g++"
+            "cpp"
+            "libstdc++"
+          )
+          sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
+          sudo -E apt-get -qq -y install "${packages_install[@]}"
           sudo -E systemctl daemon-reload
 
           echo "status=success" >> ${GITHUB_OUTPUT}
