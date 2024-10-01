@@ -103,8 +103,13 @@ jobs:
           sudo -E apt-get -qq -y update
           installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
 
-          # ----- regex for uninstall -----
+          
+          # ===== regex for uninstall =====
           regexes=(
+            # ----- Language and Runtime -----
+            "clang-[0-9]+.*"
+            "clang-format-[0-9]+.*"
+            "clang-tidy-[0-9]+.*"
             "gcc-[0-9]+.*"
             "libgcc-[0-9]+.*"
             "g++-[0-9]+.*"
@@ -134,8 +139,12 @@ jobs:
           done
           set -e
 
-          # ----- package for install -----
+          # ===== package for install =====
           packages_install=(
+            # ----- Language and Runtime -----
+            "clang"
+            "clang-format"
+            "clang-tidy"
             "gcc"
             "libgcc-13-dev"
             "g++"
