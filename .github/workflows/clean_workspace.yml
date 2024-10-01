@@ -155,6 +155,7 @@ jobs:
             "gfortran"
             "libgfortran-13-dev"
             # ----- Java -----
+            "temurin-21-jdk"
           )
           echo "Packages to be installed: ${packages_install[@]}"
           sudo -E apt-get -qq -y install "${packages_install[@]}"
