@@ -1,4 +1,4 @@
-name: (Dev) Workspace Cleaner
+name: Workspace Checker
 
 on:
   repository_dispatch:
@@ -25,7 +25,7 @@ env:
 
 jobs:
   build:
-    name: Clean Workspace
+    name: Workspace Checking
     runs-on: ubuntu-24.04
     env:
       path_build: "/android/lineage"
