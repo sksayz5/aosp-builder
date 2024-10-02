@@ -466,6 +466,12 @@ jobs:
           export CCACHE_EXEC=/usr/bin/ccache
           ccache -M 50G
           ccache -o compression=true
+          mkdir -p ~/.cache/ccache/
+
+          cat >> ~/.bashrc <<EOF
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          EOF
 
       - name: Initialize repo
         id: init-repo
@@ -481,6 +487,13 @@ jobs:
           #   export PATH="$HOME/bin:$PATH"
           # fi
           # export PATH=~/bin:$PATH
+
+          # cat >> ~/.profile <<EOF
+          # if [ -d "$HOME/bin" ] ; then
+          #     PATH="$HOME/bin:$PATH"
+          # fi
+          # EOF
+          # source ~/.profile
 
       - name: Initialize LineageOS source
         working-directory: ${{ env.path_build }}
