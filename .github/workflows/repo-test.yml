@@ -439,7 +439,7 @@ jobs:
           echo '<manifest></manifest>' > ${{ env.local_manifest }}
           
           # ----- Blank local manifest -----
-          xmlstarlet ed --inplace --insert / -t elem -n "manifest" -v "" "${{ env.local_manifest }}"
+          # xmlstarlet ed --inplace --insert / -t elem -n "manifest" -v "" "${{ env.local_manifest }}"
 
           # ----- Add remote -----
           xmlstarlet ed --inplace \
