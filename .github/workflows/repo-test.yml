@@ -435,7 +435,7 @@ jobs:
           export PATH=~/bin:$PATH
 
           mkdir -p .repo/local_manifests
-          touch ${{ env.local_manifest }}
+          # touch ${{ env.local_manifest }}
           echo '<manifest></manifest>' > ${{ env.local_manifest }}
           
           # ----- Blank local manifest -----
