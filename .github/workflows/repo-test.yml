@@ -450,26 +450,27 @@ jobs:
 
           # ----- Add projects -----
           add_project() {
-            local --project_path=$1
-            local --project_name=$2
-            local --project_revision=$3
+            local project_index=$1
+            local project_path=$2
+            local project_name=$3
+            local project_revision=$4
 
-            local --project_remote="github"
-            local --project_clone_depth="1"
+            local project_remote="github"
+            local project_clone_depth="1"
 
             xmlstarlet ed --inplace \
               --subnode /manifest --type elem --name "project" --value "" \
-              --insert //project[last()] --type attr --name "path" --value "$project_path" \
-              --insert //project[last()] --type attr --name "name" --value "$project_name" \
-              --insert //project[last()] --type attr --name "remote" --value "$project_remote" \
-              --insert //project[last()] --type attr --name "revision" --value "$project_revision" \
-              --insert //project[last()] --type attr --name "clone-depth" --value "$project_clone_depth" \
+              --insert //project[$project_index] --type attr --name "path" --value "$project_path" \
+              --insert //project[$project_index] --type attr --name "name" --value "$project_name" \
+              --insert //project[$project_index] --type attr --name "remote" --value "$project_remote" \
+              --insert //project[$project_index] --type attr --name "revision" --value "$project_revision" \
+              --insert //project[$project_index] --type attr --name "clone-depth" --value "$project_clone_depth" \
               "${{ env.local_manifest }}"
           }
           # Function to add a project to the manifest
-          add_project "device/xiaomi/ginkgo" "PixelOS-Devices/device_xiaomi_ginkgo" "twelve"
-          add_project "vendor/xiaomi/ginkgo" "PixelOS-Devices/vendor_xiaomi_ginkgo" "twelve"
-          add_project "kernel/xiaomi/ginkgo" "PixelOS-Devices/kernel_xiaomi_ginkgo" "twelve"
+          add_project "1" "device/xiaomi/ginkgo" "PixelOS-Devices/device_xiaomi_ginkgo" "twelve"
+          add_project "2" "vendor/xiaomi/ginkgo" "PixelOS-Devices/vendor_xiaomi_ginkgo" "twelve"
+          add_project "3" "kernel/xiaomi/ginkgo" "PixelOS-Devices/kernel_xiaomi_ginkgo" "twelve"
 
           # ===== check local manifest =====
           cat ${{ env.local_manifest }}
