@@ -365,3 +365,60 @@ jobs:
 
           df -Th
           echo "status=success" >> "${GITHUB_OUTPUT}"
+
+      - name: Setup ccache
+        id: ccache
+        if: ${{ 'true' == 'false' }} # disable
+        working-directory: /
+        run: |
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          ccache -M 50G
+          ccache -o compression=true
+          mkdir -p ~/.cache/ccache/
+
+          cat >> ~/.bashrc <<EOF
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          EOF
+
+      - name: Initialize repo
+        id: init-repo
+        working-directory: /
+        run: |
+          echo "Current working directory: $(pwd)"
+
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+rx ~/bin/repo
+
+          # if [ -d "$HOME/bin" ] ; then
+          #   export PATH="$HOME/bin:$PATH"
+          # fi
+          # export PATH=~/bin:$PATH
+
+          cat >> ~/.profile <<EOF
+          if [ -d "$HOME/bin" ] ; then
+              PATH="$HOME/bin:$PATH"
+          fi
+          EOF
+          source ~/.profile
+
+      - name: Initialize LineageOS source
+        working-directory: ${{ env.path_build }}
+        run: |
+          echo "Current working directory: $(pwd)"
+          # export PATH=~/bin:$PATH
+          # export REPO_ALLOW_SHALLOW=1
+
+          repo init \
+            --manifest-url https://github.com/LineageOS/android.git \
+            --manifest-branch ${{ env.manifest-branch }} \
+            --no-clone-bundle \
+            --depth=1 \
+            --git-lfs \
+            --verbose
+
+          df -Th
+          echo "Repository initialized"
+          
