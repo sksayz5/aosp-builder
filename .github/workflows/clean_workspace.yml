@@ -4,16 +4,16 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      # manifest-branch:
-      #   description: "Manifest branch"
-      #   required: true
-      #   default: "lineage-18.1"
-      #   type: string
-      # android-version:
-      #   description: "Android version"
-      #   required: true
-      #   default: "ginkgo"
-      #   type: string
+      manifest-branch:
+        description: "Manifest branch"
+        required: true
+        default: "lineage-18.1"
+        type: string
+      android-version:
+        description: "Android version"
+        required: true
+        default: "ginkgo"
+        type: string
       custom_env:
         description: "key=value;key=value"
         type: string
@@ -181,7 +181,8 @@ jobs:
             "libgcc-${{ env.VERSION_GCC }}-dev"
             "g++"
             "cpp"
-            "libstdc++-${{ env.VERSION_GCC }}-dev"
+            # "libstdc++-${{ env.VERSION_GCC }}-dev"
+            "libstdc++-dev"
             "gfortran"
             "libgfortran-${{ env.VERSION_GCC }}-dev"
             # ----- Java -----
@@ -261,10 +262,12 @@ jobs:
             "lib32z1-dev"
             "libsdl1.2-dev"
             "pngcrush"
-            "vim"
+            # "vim"
+            "xmlstarlet"
           )
           sudo -E apt-get -y -qq update
           sudo -E apt-get -y -qq install "${packages_slim[@]}"
+          sudo -E apt-get -y -qq install "${packages_extra[@]}"
           sudo -E apt-get -qq -y autoremove --purge
           sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
