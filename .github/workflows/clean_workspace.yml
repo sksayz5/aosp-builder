@@ -292,6 +292,8 @@ jobs:
 
           # ===== Check GCC version =====
           gcc --version
+          g++ --version
+          gfortran --version
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
