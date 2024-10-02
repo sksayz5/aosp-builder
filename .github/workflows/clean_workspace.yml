@@ -280,7 +280,7 @@ jobs:
         uses: actions/setup-java@main
         with:
           distribution: "temurin"
-          java-version: "21"
+          java-version: 21
 
       - name: Check Workspace
         id: check-workspace
@@ -396,21 +396,20 @@ jobs:
           #   export PATH="$HOME/bin:$PATH"
           # fi
           # export PATH=~/bin:$PATH
-
-          cat >> ~/.profile <<EOF
-          if [ -d "$HOME/bin" ] ; then
-              PATH="$HOME/bin:$PATH"
-          fi
-          EOF
-          source ~/.profile
+          # cat >> ~/.profile <<EOF
+          # if [ -d "$HOME/bin" ] ; then
+          #     PATH="$HOME/bin:$PATH"
+          # fi
+          # EOF
+          # source ~/.profile
 
       - name: Initialize LineageOS source
         id: repo-init
         working-directory: ${{ env.path_build }}
         run: |
           echo "Current working directory: $(pwd)"
-          # export PATH=~/bin:$PATH
-          # export REPO_ALLOW_SHALLOW=1
+          export PATH=~/bin:$PATH
+          export REPO_ALLOW_SHALLOW=1
 
           repo init \
             --manifest-url https://github.com/LineageOS/android.git \
