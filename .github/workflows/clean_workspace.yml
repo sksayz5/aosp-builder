@@ -420,5 +420,7 @@ jobs:
             --git-lfs \
             --verbose
 
+          ls -lh ./
+
           df -Th
           echo "Repository initialized"
