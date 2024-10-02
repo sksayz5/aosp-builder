@@ -279,7 +279,7 @@ jobs:
             "g++-${{ env.VERSION_GCC }}"
             "cpp-${{ env.VERSION_GCC }}"
             "libstdc++-${{ env.VERSION_GCC }}-dev"
-            "gfortran-${{ env.VERSION_GCC }}-dev"
+            "gfortran-${{ env.VERSION_GCC }}"
             "libgfortran-${{ env.VERSION_GCC }}-dev"
           )
           echo "Packages to be installed: ${packages_install[@]}"
