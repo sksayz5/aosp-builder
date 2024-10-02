@@ -1,4 +1,4 @@
-name: LineageOS (Dev)
+name: LineageOS (Testing)
 
 on:
   repository_dispatch:
