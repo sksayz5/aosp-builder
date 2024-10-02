@@ -1,4 +1,4 @@
-name: (Dev) repo command test
+name: LineageOS (Dev)
 
 on:
   repository_dispatch:
@@ -7,7 +7,7 @@ on:
       manifest-branch:
         description: "Manifest branch"
         required: true
-        default: "lineage-19.1"
+        default: "lineage-18.1"
         type: string
       android-version:
         description: "Android version"
@@ -25,11 +25,11 @@ env:
 
 jobs:
   build:
-    name: Clean Workspace
+    name: Build LineageOS
     runs-on: ubuntu-24.04
     env:
       path_build: "/android/lineage"
-      manifest-branch: ${{ inputs.manifest-branch || 'lineage-19.1' }}
+      manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
       android-version: ${{ inputs.android-version || 'ginkgo' }}
     steps:
       - name: Set environment variable
@@ -468,9 +468,9 @@ jobs:
               "${{ env.local_manifest }}"
           }
           # Function to add a project to the manifest
-          add_project "1" "device/xiaomi/ginkgo" "PixelOS-Devices/device_xiaomi_ginkgo" "twelve"
-          add_project "2" "vendor/xiaomi/ginkgo" "PixelOS-Devices/vendor_xiaomi_ginkgo" "twelve"
-          add_project "3" "kernel/xiaomi/ginkgo" "PixelOS-Devices/kernel_xiaomi_ginkgo" "twelve"
+          add_project "1" "device/xiaomi/ginkgo" "PixelOS-Devices/device_xiaomi_ginkgo" "eleven"
+          add_project "2" "vendor/xiaomi/ginkgo" "PixelOS-Devices/vendor_xiaomi_ginkgo" "eleven"
+          add_project "3" "kernel/xiaomi/ginkgo" "PixelOS-Devices/kernel_xiaomi_ginkgo" "eleven"
 
           # ===== check local manifest =====
           cat ${{ env.local_manifest }}
