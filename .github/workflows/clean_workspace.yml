@@ -96,8 +96,8 @@ jobs:
         id: clean-runner
         env:
           DEBIAN_FRONTEND: noninteractive
-          VERSION_GCC: "13"
-          VERSION_JDK: "21"
+          VERSION_GCC: 13
+          VERSION_JDK: 21
         working-directory: /
         run: |
           echo -e "Current working directory: $(pwd)"
@@ -139,16 +139,16 @@ jobs:
           # ----- package for re-install -----
           regexes=(
             # ----- Language and Runtime -----
-            "clang-[0-9]+.*"
-            "clang-format-[0-9]+.*"
-            "clang-tidy-[0-9]+.*"
-            "gcc-[0-9]+.*"
-            "libgcc-[0-9]+.*"
-            "g++-[0-9]+.*"
-            "cpp-[0-9]+.*"
-            "libstdc++-[0-9]+.*"
-            "gfortran-[0-9]+.*"
-            "libgfortran-[0-9]+.*"
+            "clang-1[0-7].*"
+            "clang-format-1[0-7].*"
+            "clang-tidy-1[0-7].*"
+            "gcc-[12|14].*"
+            "libgcc-[12|14].*"
+            "g++-[12|14].*"
+            "cpp-[12|14].*"
+            "libstdc++-[12|14].*"
+            "gfortran-[12|14].*"
+            "libgfortran-[12|14].*"
             # ----- Java -----
             "temurin-[0-9]+-jdk"
           )
