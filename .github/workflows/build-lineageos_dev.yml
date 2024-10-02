@@ -1,0 +1,601 @@
+name: (Dev) Build LineageOS
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      manifest-branch:
+        description: "Manifest branch"
+        required: true
+        default: "lineage-18.1"
+        type: string
+      android-version:
+        description: "Android version"
+        required: true
+        default: "ginkgo"
+        type: string
+      custom_env:
+        description: "key=value;key=value"
+        type: string
+        required: false
+        default: ""
+
+env:
+  custom_env: ${{ inputs.custom_env || '' }}
+
+jobs:
+  build:
+    name: Build LineageOS
+    runs-on: ubuntu-24.04
+    env:
+      path_build: "/android/lineage"
+      manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
+      android-version: ${{ inputs.android-version || 'ginkgo' }}
+    steps:
+      - name: Set environment variable
+        id: var
+        if: ${{ 'true' == 'false' }} # disable
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          path_build="${{ env.path_build }}"
+
+          # ========== GITHUB_ENV ==========
+          env_vars=(
+            "path_build"
+          )
+          for var in "${env_vars[@]}"; do
+            echo "${var}=${!var}" | tee -a $GITHUB_ENV
+          done
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Load Custom Environment Variables
+        id: env-custom
+        if: ${{ env.custom_env != '' }}
+        env:
+          flag_split: ";"
+        working-directory: /
+        run: |
+          echo "${{ env.custom_env }}" | tr '${{ env.flag_split }}' '\n' | tee -a $GITHUB_ENV
+
+      - name: Clean Snap
+        id: clean-snap
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          sudo -E apt-get -qq -y update
+          sudo snap list
+
+          # ===== Remove snap =====
+          for p in $(snap list | awk '{print $1}'); do
+            sudo snap remove $p
+          done
+          sudo systemctl stop snapd
+          sudo systemctl disable --now snapd.socket
+          sudo apt-get -qq -y autoremove --purge snapd
+          sudo rm -rf ~/snap
+          sudo rm -rf /snap
+          sudo rm -rf /var/snap
+          sudo rm -rf /var/lib/snapd
+          sudo rm -rf /var/cache/snapd
+          sudo bash -c 'cat <<EOF > /etc/apt/preferences.d/nosnap.pref
+          Package: snapd
+          Pin: release a=*
+          Pin-Priority: -10
+          EOF'
+          sudo -E systemctl daemon-reload
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Clean Runner
+        id: clean-runner
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          VERSION_GCC: "13"
+          VERSION_JDK: "21"
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          # ===== Clean Docker =====
+          docker image list
+          # for image in $(docker images -q); do
+          #   docker rmi -f $image
+          # done
+          docker image prune -a -f
+
+          # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
+          sudo -E apt-get -qq -y update
+          installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
+          
+          # ===== Clean Apt =====
+          # ----- package for purge -----
+          packages_purge=(
+            "docker*"
+            "ghc*"
+            "zulu*"
+            "google*"
+            "firefox*"
+            "dotnet*"
+            "powershell*"
+            "microsoft-edge*"
+            # Databases
+            "sqlite*"
+            "postgresql*"
+            "mysql*"
+            "mongodb*"
+            "moby*"
+            "apache2*"
+            "nginx*"
+            "php*"
+          )
+          sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
+
+          # ----- package for re-install -----
+          regexes=(
+            # ----- Language and Runtime -----
+            "clang-[0-9]+.*"
+            "clang-format-[0-9]+.*"
+            "clang-tidy-[0-9]+.*"
+            "gcc-[0-9]+.*"
+            "libgcc-[0-9]+.*"
+            "g++-[0-9]+.*"
+            "cpp-[0-9]+.*"
+            "libstdc++-[0-9]+.*"
+            "gfortran-[0-9]+.*"
+            "libgfortran-[0-9]+.*"
+            # ----- Java -----
+            "temurin-[0-9]+-jdk"
+          )
+          packages_purge=()
+          for regex in "${regexes[@]}"; do
+            for package in $installed_packages; do
+              if [[ $package =~ $regex ]]; then
+                  packages_purge+=("$package")
+              fi
+            done
+          done
+
+          echo "Packages to be purged: ${packages_purge[@]}"
+          set +e
+          for package in "${packages_purge[@]}"; do
+            echo "Attempting to remove $package"
+            sudo -E apt-get -qq -y autoremove --purge $package
+            if [[ $? -ne 0 ]]; then
+              echo "Failed to remove $package"
+            fi
+          done
+          set -e
+
+          packages_install=(
+            # ----- Language and Runtime -----
+            "clang"
+            "clang-format"
+            "clang-tidy"
+            "gcc"
+            "libgcc-${{ env.VERSION_GCC }}-dev"
+            "g++"
+            "cpp"
+            "libstdc++-${{ env.VERSION_GCC }}-dev"
+            "gfortran"
+            "libgfortran-${{ env.VERSION_GCC }}-dev"
+            # ----- Java -----
+            "openjdk-${{ env.VERSION_JDK }}-jdk"
+          )
+          echo "Packages to be installed: ${packages_install[@]}"
+          sudo -E apt-get -qq -y install "${packages_install[@]}"
+
+          # ===== Clean Browsers and Drivers =====
+          sudo -E rm -rf /usr/local/share/chromedriver-linux64
+          sudo -E rm -rf /usr/local/share/chromium
+          sudo -E rm -rf /usr/local/share/edge_driver
+          sudo -E rm -rf /usr/local/share/gecko_driver
+          sudo -E rm -rf /usr/share/java/selenium-server.jar
+
+          # ===== Clean PowerShell Tools =====
+          sudo -E rm -rf /usr/local/share/powershell
+
+          # ===== Clean Android Tools =====
+          sudo find /usr/local/lib/android/sdk/ndk/ -type d -regex '.*/2[0-6].*' -exec rm -rf {} +
+
+          # ===== Clean Swap =====
+          # 如果环境变量 AGENT_TOOLSDIRECTORY 不为空，则删除该目录及其所有内容
+          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+          # 关闭所有交换空间 删除指定的交换文件
+          sudo swapoff -a
+          sudo rm -f /swapfile /mnt/swapfile
+
+          # ===== reload =====
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo -E systemctl daemon-reload
+          
+          df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Initialization environment
+        id: init
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          packages_install=(
+            "ack"
+            "antlr3"
+            "asciidoc"
+            "autoconf"
+            "automake"
+            "autopoint"
+            "bc"
+            "binutils"
+            "bison"
+            "build-essential"
+            "bzip2"
+            "ca-certificates"
+            "clang"
+            "clangd"
+            "cmake"
+            "cpio"
+            "curl"
+            "device-tree-compiler"
+            "dwarves"
+            "ecj"
+            "fastjar"
+            "flex"
+            "gawk"
+            "g++"
+            "gcc"
+            "gcc-aarch64-linux-gnu"
+            "git"
+            "git-lfs"
+            "gnupg"
+            "gperf"
+            "haveged"
+            "help2man"
+            "intltool"
+            "jq"
+            "libelf-dev"
+            "libglib2.0-dev"
+            "libgmp3-dev"
+            "libltdl-dev"
+            "libmpc-dev"
+            "libmpfr-dev"
+            "libncurses5-dev"
+            "libreadline-dev"
+            "libssl-dev"
+            "libtool"
+            "libxml2"
+            "libxml2-utils"
+            "lld"
+            "lldb"
+            "lz4"
+            "lzop"
+            "make"
+            "mkisofs"
+            "ninja-build"
+            "p7zip-full"
+            "patch"
+            "pkgconf"
+            "python3"
+            "python3-pip"
+            "re2c"
+            "rsync"
+            "schedtool"
+            "scons"
+            "squashfs-tools"
+            "subversion"
+            "swig"
+            "uglifyjs"
+            "unzip"
+            "vim"
+            "wget"
+            "xsltproc"
+            "zip"
+            "zlib1g-dev"
+          )
+          # Commented out packages (sorted):
+          # "ccache"
+          # "lib32gcc-s1"
+          # "libc6-dev-i386"
+          # "libdb++-dev"
+          # "gcc-multilib"
+          # "g++-multilib"
+          # "libncursesw5"
+          # "libncursesw5-dev"
+          # "lrzsz"
+          # "msmtp"
+          # "nano"
+          # "p7zip"
+          # "python3-docutils"
+          # "python3-ply"
+          # "qemu-utils"
+          # "texinfo"
+          # "xmlto"
+          # "xxd"
+          packages_slim=(
+            "bc"
+            "bison"
+            "build-essential"
+            "ca-certificates"
+            "curl"
+            "flex"
+            "g++"
+            "gcc"
+            "gcc-aarch64-linux-gnu"
+            "git"
+            "git-lfs"
+            "gnupg"
+            "gperf"
+            "libelf-dev"
+            "lz4"
+            "libssl-dev"
+            "libxml2"
+            "libxml2-utils"
+            "lzop"
+            "make"
+            "python3"
+            "rsync"
+            "schedtool"
+            "squashfs-tools"
+            "xsltproc"
+            "zip"
+            "zlib1g-dev"
+          )
+          packages_extra=(
+            "imagemagick"
+            "lib32readline-dev"
+            "lib32z1-dev"
+            "libsdl1.2-dev"
+            "pngcrush"
+            "vim"
+          )
+          sudo -E apt-get -y -qq update
+          # sudo -E apt-get -y -qq install "${packages_install[@]}"
+          sudo -E apt-get -y -qq install "${packages_slim[@]}"
+          # sudo -E apt-get -y install "${packages_extra[@]}"
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo -E systemctl daemon-reload
+
+          df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Setup JDK
+        uses: actions/setup-java@main
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Check Workspace
+        id: check-workspace
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          echo -e "Current working directory: $(pwd)"
+
+          sudo -E apt-get autoremove --purge -y -qq
+          sudo -E apt-get clean -y -qq
+          # sudo -E rm -rf /var/lib/apt/lists/*
+          # sudo -E rm -rf /var/log/*.log
+
+          apt list --installed
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
+
+          # ----- check extra dir -----
+          dir_extra=(
+            "/usr/local/share/"
+            "/usr/share/"
+            "/usr/local/lib/android/sdk/"
+            "/usr/local/lib/android/sdk/build-tools/"
+            "/usr/local/lib/android/sdk/platforms/"
+            "/usr/local/lib/android/sdk/ndk/"
+          )
+          for dir in "${dir_extra[@]}"; do
+            echo "listing: ${dir}"
+            du -h --max-depth=1 ${dir}
+            ls -lh ${dir}
+          done
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Create simulated physical disk
+        id: disk
+        env:
+          path_build: ${{ env.path_build }}
+          root_num: 4
+          mnt_num: 1
+        working-directory: /
+        run: |
+          echo "Current working directory: $(pwd)"
+
+          # 获取 /mnt 和 / 分区的剩余空间
+          mnt_available=$(df -B1 /mnt | tail -1 | awk '{print $4}')
+          root_available=$(df -B1 / | tail -1 | awk '{print $4}')
+          echo "Raw available space in /mnt (bytes): ${mnt_available}"
+          echo "Raw available space in / (bytes): ${root_available}"
+
+          # 减去缓冲空间：/mnt 和 / 分区分别减去缓冲
+          gb2bytes=$((1024 * 1024 * 1024))
+          mnt_size=$((${mnt_available} - ${{ env.mnt_num }} * ${gb2bytes}))
+          root_size=$((${root_available} - ${{ env.root_num }} * ${gb2bytes}))
+          echo "Available space in /mnt (bytes): ${mnt_size}"
+          echo "Available space in / (bytes): ${root_size}"
+
+          # 创建磁盘映像文件
+          sudo truncate -s "${mnt_size}" /mnt/mnt.img
+          sudo truncate -s "${root_size}" /root.img
+
+          # 动态分配可用的循环设备
+          LOOP_MNT=$(sudo losetup --find --show /mnt/mnt.img)
+          LOOP_ROOT=$(sudo losetup --find --show /root.img)
+          echo "Assigned loop device for /mnt/mnt.img: ${LOOP_MNT}"
+          echo "Assigned loop device for /root.img: ${LOOP_ROOT}"
+
+          # 创建物理卷
+          sudo pvcreate "${LOOP_MNT}"
+          sudo pvcreate "${LOOP_ROOT}"
+          # 创建卷组
+          sudo vgcreate github "${LOOP_MNT}" "${LOOP_ROOT}"
+
+          # 在 github 卷组上创建一个名为 runner 的逻辑卷，使用所有可用空间, 并格式化为XFS文件系统
+          sudo lvcreate -n runner -l 100%FREE github
+          sudo mkfs.xfs /dev/github/runner
+
+          # 创建一个挂载点 ${path_build}, 将 runner 逻辑卷挂载到 ${path_build}, 将 ${path_build} 的所有者和组更改为 runner
+          sudo mkdir -p "${path_build}"
+          sudo mount /dev/github/runner "${path_build}"
+          sudo chown -R runner:runner "${path_build}"
+
+          df -Th
+          echo "status=success" >> "${GITHUB_OUTPUT}"
+
+      - name: Setup ccache
+        id: ccache
+        if: ${{ 'true' == 'false' }} # disable
+        working-directory: /
+        run: |
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          ccache -M 50G
+          ccache -o compression=true
+          mkdir -p ~/.cache/ccache/
+
+          cat >> ~/.bashrc <<EOF
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          EOF
+
+      - name: Initialize repo
+        id: repo-init
+        working-directory: /
+        run: |
+          echo "Current working directory: $(pwd)"
+
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+rx ~/bin/repo
+
+          # if [ -d "$HOME/bin" ] ; then
+          #   export PATH="$HOME/bin:$PATH"
+          # fi
+          # export PATH=~/bin:$PATH
+
+          # cat >> ~/.profile <<EOF
+          # if [ -d "$HOME/bin" ] ; then
+          #     PATH="$HOME/bin:$PATH"
+          # fi
+          # EOF
+          # source ~/.profile
+
+      - name: Initialize LineageOS source
+        working-directory: ${{ env.path_build }}
+        run: |
+          echo "Current working directory: $(pwd)"
+          export PATH=~/bin:$PATH
+          export REPO_ALLOW_SHALLOW=1
+
+          repo init \
+            --manifest-url https://github.com/LineageOS/android.git \
+            --manifest-branch ${{ env.manifest-branch }} \
+            --no-clone-bundle \
+            --depth=1 \
+            --git-lfs \
+            --verbose
+
+          df -Th
+          echo "Repository initialized"
+        
+      - name: DIY xml
+        working-directory: ${{ env.path_build }}
+        run: |
+          echo "Current working directory: $(pwd)"
+          export PATH=~/bin:$PATH
+
+          ls -lh
+
+      - name: Sync LineageOS source
+        id: repo-sync
+        working-directory: ${{ env.path_build }}
+        run: |
+          echo "Current working directory: $(pwd)"
+          export PATH=~/bin:$PATH
+          export REPO_ALLOW_SHALLOW=1
+          repo sync --help
+
+          # repo sync -c -n -j 4 && repo sync -c -l -j 16
+          repo sync \
+            --current-branch \
+            --no-clone-bundle \
+            --no-tags \
+            --verbose \
+            --optimized-fetch \
+            --prune \
+            --auto-gc \
+            -j$(nproc --all)
+
+          repo status
+
+          df -Th
+          echo "Source code synced"
+
+      - name: Build LineageOS
+        id: build
+        working-directory: ${{ env.path_build }}
+        run: |
+          echo "Current working directory: $(pwd)"
+          export PATH=~/bin:$PATH
+
+          echo "===== source build/envsetup.sh ====="
+          source build/envsetup.sh
+
+          echo "===== breakfast ${{ env.android-version }} ====="
+          set +e
+          breakfast ${{ env.android-version }}
+          # ls -lh
+          # ls -lh ./vendor/
+          # ls -lh ./device/
+          # ls -lh ./device/xiaomi/
+          # ls -lh ./device/xiaomi/sm6125-common/
+
+          # echo "===== ./device/xiaomi/sm6125-common/setup-makefiles.sh ====="
+          # cat ./device/xiaomi/sm6125-common/setup-makefiles.sh
+          export DEVICE_COMMON=sm6125-common
+          export DEVICE=ginkgo
+          export VENDOR=xiaomi
+          source ./device/xiaomi/sm6125-common/setup-makefiles.sh
+          # echo "===== ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk ====="
+          # cat ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk
+          # echo "===== ./vendor/xiaomi/sm6125-common/Android.mk ====="
+          # cat ./vendor/xiaomi/sm6125-common/Android.mk
+          set -e
+
+          breakfast ${{ env.android-version }}
+
+          echo "===== croot ====="
+          croot
+          echo "===== brunch ${{ env.android-version }} ====="
+          brunch ${{ env.android-version }}
+
+          echo "Build completed"
+
+      - name: Upload OpenWrt to Release
+        id: release
+        uses: ncipollo/release-action@main
+        with:
+          name: "lineageos-build"
+          tag: "lineageos"
+          artifacts: "${{ env.path_build }}/out/target/product/ginkgo/*.zip"
+          allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          # bodyFile: "${{ env.release_md }}"
+          body: "lineageos"
