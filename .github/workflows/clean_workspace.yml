@@ -419,7 +419,7 @@ jobs:
             --git-lfs \
             --verbose
 
-          ls -lh ./
+          ls -lh ${{ env.path_build }}
 
           df -Th
           echo "Repository initialized"
