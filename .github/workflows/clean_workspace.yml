@@ -382,8 +382,8 @@ jobs:
           export CCACHE_EXEC=/usr/bin/ccache
           EOF
 
-      - name: Initialize repo
-        id: init-repo
+      - name: Setup repo
+        id: repo-setup
         working-directory: /
         run: |
           echo "Current working directory: $(pwd)"
@@ -405,6 +405,7 @@ jobs:
           source ~/.profile
 
       - name: Initialize LineageOS source
+        id: repo-init
         working-directory: ${{ env.path_build }}
         run: |
           echo "Current working directory: $(pwd)"
@@ -421,4 +422,3 @@ jobs:
 
           df -Th
           echo "Repository initialized"
-          
