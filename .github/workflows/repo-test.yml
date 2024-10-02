@@ -94,7 +94,7 @@ jobs:
 
       - name: Clean Runner
         id: clean-runner
-        if: ${{ 'true' == 'false' }} # disable
+        # if: ${{ 'true' == 'false' }} # disable
         env:
           DEBIAN_FRONTEND: noninteractive
           VERSION_GCC: 13
