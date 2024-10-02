@@ -436,6 +436,7 @@ jobs:
 
           mkdir -p .repo/local_manifests
           touch ${{ env.local_manifest }}
+          echo '<manifest></manifest>' > ${{ env.local_manifest }}
           
           # ----- Blank local manifest -----
           xmlstarlet ed --inplace --insert / -t elem -n "manifest" -v "" "${{ env.local_manifest }}"
