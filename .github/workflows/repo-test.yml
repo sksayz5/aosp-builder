@@ -444,7 +444,7 @@ jobs:
           # ----- Add remote -----
           xmlstarlet ed --inplace \
             -s /manifest -t elem -n "remote" -v "" \
-            -i //remote -t attr -n "name" -v "github" \
+            -i //remote -t attr -n "name" -v "gh" \
             -i //remote -t attr -n "fetch" -v "https://github.com" \
             "${{ env.local_manifest }}"
 
@@ -455,7 +455,7 @@ jobs:
             local project_name=$3
             local project_revision=$4
 
-            local project_remote="github"
+            local project_remote="gh"
             local project_clone_depth="1"
 
             xmlstarlet ed --inplace \
