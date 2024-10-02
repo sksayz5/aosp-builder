@@ -435,6 +435,7 @@ jobs:
           export PATH=~/bin:$PATH
 
           mkdir -p .repo/local_manifests
+          touch ${{ env.local_manifest }}
           
           # ----- Blank local manifest -----
           xmlstarlet ed --inplace --insert / -t elem -n "manifest" -v "" "${{ env.local_manifest }}"
