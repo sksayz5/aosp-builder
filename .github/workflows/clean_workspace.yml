@@ -96,8 +96,6 @@ jobs:
         id: clean-runner
         env:
           DEBIAN_FRONTEND: noninteractive
-          VERSION_GCC: "13"
-          VERSION_JDK: "21"
         working-directory: /
         run: |
           echo -e "Current working directory: $(pwd)"
@@ -135,61 +133,6 @@ jobs:
             "php*"
           )
           sudo -E apt-get -qq -y autoremove --purge "${packages_purge[@]}"
-
-          # ----- package for re-install -----
-          regexes=(
-            # ----- Language and Runtime -----
-            "clang-[0-9]+.*"
-            "clang-format-[0-9]+.*"
-            "clang-tidy-[0-9]+.*"
-            "gcc-[0-9]+.*"
-            "libgcc-[0-9]+.*"
-            "g++-[0-9]+.*"
-            "cpp-[0-9]+.*"
-            "libstdc++-[0-9]+.*"
-            "gfortran-[0-9]+.*"
-            "libgfortran-[0-9]+.*"
-            # ----- Java -----
-            "temurin-[0-9]+-jdk"
-          )
-          packages_purge=()
-          for regex in "${regexes[@]}"; do
-            for package in $installed_packages; do
-              if [[ $package =~ $regex ]]; then
-                  packages_purge+=("$package")
-              fi
-            done
-          done
-
-          echo "Packages to be purged: ${packages_purge[@]}"
-          set +e
-          for package in "${packages_purge[@]}"; do
-            echo "Attempting to remove $package"
-            sudo -E apt-get -qq -y autoremove --purge $package
-            if [[ $? -ne 0 ]]; then
-              echo "Failed to remove $package"
-            fi
-          done
-          set -e
-
-          packages_install=(
-            # ----- Language and Runtime -----
-            "clang"
-            "clang-format"
-            "clang-tidy"
-            "gcc"
-            "libgcc-${{ env.VERSION_GCC }}-dev"
-            "g++"
-            "cpp"
-            # "libstdc++-${{ env.VERSION_GCC }}-dev"
-            "libstdc++-dev"
-            "gfortran"
-            "libgfortran-${{ env.VERSION_GCC }}-dev"
-            # ----- Java -----
-            "openjdk-${{ env.VERSION_JDK }}-jdk"
-          )
-          echo "Packages to be installed: ${packages_install[@]}"
-          sudo -E apt-get -qq -y install "${packages_install[@]}"
 
           # ===== Clean Browsers and Drivers =====
           sudo -E rm -rf /usr/local/share/chromedriver-linux64
@@ -268,11 +211,187 @@ jobs:
           sudo -E apt-get -y -qq update
           sudo -E apt-get -y -qq install "${packages_slim[@]}"
           sudo -E apt-get -y -qq install "${packages_extra[@]}"
+
+          # ===== reload =====
           sudo -E apt-get -qq -y autoremove --purge
           sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
 
           df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Clean GCC
+        id: clean-gcc
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          sudo -E apt-get -qq -y update
+          installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
+
+          regexes=(
+            "gcc-[0-9]+.*"
+            "libgcc-[0-9]+.*"
+            "g++-[0-9]+.*"
+            "cpp-[0-9]+.*"
+            "libstdc++-[0-9]+.*"
+            "gfortran-[0-9]+.*"
+            "libgfortran-[0-9]+.*"
+          )
+          packages_purge=()
+          for regex in "${regexes[@]}"; do
+            for package in $installed_packages; do
+              if [[ $package =~ $regex ]]; then
+                  packages_purge+=("$package")
+              fi
+            done
+          done
+
+          echo "Packages to be purged: ${packages_purge[@]}"
+          set +e
+          for package in "${packages_purge[@]}"; do
+            echo "Attempting to remove $package"
+            sudo -E apt-get -qq -y autoremove --purge $package
+            if [[ $? -ne 0 ]]; then
+              echo "Failed to remove $package"
+            fi
+          done
+          set -e
+
+          # ===== reload =====
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo -E systemctl daemon-reload
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Setup GCC
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          VERSION_GCC: 14
+        working-directory: /
+        run: |
+          sudo -E apt-get -qq -y update
+
+          packages_install=(
+            "gcc-${{ env.VERSION_GCC }}"
+            "libgcc-${{ env.VERSION_GCC }}-dev"
+            "g++-${{ env.VERSION_GCC }}"
+            "cpp-${{ env.VERSION_GCC }}"
+            "libstdc++-${{ env.VERSION_GCC }}-dev"
+            "gfortran-${{ env.VERSION_GCC }}-dev"
+            "libgfortran-${{ env.VERSION_GCC }}-dev"
+          )
+          echo "Packages to be installed: ${packages_install[@]}"
+          sudo -E apt-get -qq -y install "${packages_install[@]}"
+
+          # ===== reload =====
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo -E systemctl daemon-reload
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Clean Clang
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          VERSION_CLANG: 14
+        working-directory: /
+        run: |
+          sudo -E apt-get -qq -y update
+          installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
+
+          regexes=(
+            "clang-[0-9]+.*"
+            "clang-format-[0-9]+.*"
+            "clang-tidy-[0-9]+.*"
+          )
+          packages_purge=()
+          for regex in "${regexes[@]}"; do
+            for package in $installed_packages; do
+              if [[ $package =~ $regex ]]; then
+                  packages_purge+=("$package")
+              fi
+            done
+          done
+
+          echo "Packages to be purged: ${packages_purge[@]}"
+          set +e
+          for package in "${packages_purge[@]}"; do
+            echo "Attempting to remove $package"
+            sudo -E apt-get -qq -y autoremove --purge $package
+            if [[ $? -ne 0 ]]; then
+              echo "Failed to remove $package"
+            fi
+          done
+          set -e
+
+          # ===== reload =====
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo -E systemctl daemon-reload
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Setup Clang
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          VERSION_CLANG: 18
+        working-directory: /
+        run: |
+          sudo -E apt-get -qq -y update
+
+          packages_install=(
+            "clang-${{ env.VERSION_CLANG }}"
+            "clang-format-${{ env.VERSION_CLANG }}"
+            "clang-tidy-${{ env.VERSION_CLANG }}"
+          )
+          echo "Packages to be installed: ${packages_install[@]}"
+          sudo -E apt-get -qq -y install "${packages_install[@]}"
+
+          # ===== reload =====
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo -E systemctl daemon-reload
+
+          echo "status=success" >> ${GITHUB_OUTPUT}
+      
+      - name: Clean JDK
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        working-directory: /
+        run: |
+          sudo -E apt-get -qq -y update
+          installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
+
+          regexes=(
+            "temurin-[0-9]+-jdk"
+          )
+          packages_purge=()
+          for regex in "${regexes[@]}"; do
+            for package in $installed_packages; do
+              if [[ $package =~ $regex ]]; then
+                  packages_purge+=("$package")
+              fi
+            done
+          done
+
+          echo "Packages to be purged: ${packages_purge[@]}"
+          set +e
+          for package in "${packages_purge[@]}"; do
+            echo "Attempting to remove $package"
+            sudo -E apt-get -qq -y autoremove --purge $package
+            if [[ $? -ne 0 ]]; then
+              echo "Failed to remove $package"
+            fi
+          done
+          set -e
+
+          # ===== reload =====
+          sudo -E apt-get -qq -y autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo -E systemctl daemon-reload
+
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Setup JDK
