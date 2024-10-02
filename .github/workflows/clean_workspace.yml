@@ -290,6 +290,9 @@ jobs:
           sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
 
+          # ===== Check GCC version =====
+          gcc --version
+
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Clean Clang
@@ -353,6 +356,9 @@ jobs:
           sudo -E apt-get -qq -y autoremove --purge
           sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
+
+          # ===== Check Clang version =====
+          clang --version
 
           echo "status=success" >> ${GITHUB_OUTPUT}
       
