@@ -1,4 +1,4 @@
-name: Workspace Check (Testing)
+name: Workspace Validation (Testing)
 
 on:
   repository_dispatch:
