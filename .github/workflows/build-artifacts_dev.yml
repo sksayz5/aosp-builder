@@ -1,4 +1,4 @@
-name: (Dev) Artifacts for Runner in Docker
+name: Docker Runner Artifact (Dev)
 
 on:
   repository_dispatch:
