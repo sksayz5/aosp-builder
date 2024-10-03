@@ -1,0 +1,89 @@
+name: self-hosted extractor (Dev)
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      custom_env:
+        description: "key=value;key=value"
+        type: string
+        required: false
+        default: ""
+env:
+  custom_env: ${{ inputs.custom_env || '' }}
+
+jobs:
+  extract-local:
+    name: (Local) Extract proprietary blobs
+    # runs-on: ubuntu-24.04
+    runs-on: [self-hosted, Linux, X64]
+    env:
+      path_build: "/android/lineage"
+    steps:
+      - name: Load Custom Environment Variables
+        id: env-custom
+        if: ${{ env.custom_env != '' }}
+        env:
+          flag_split: ";"
+        working-directory: /
+        run: |
+          echo "${{ env.custom_env }}" | tr '${{ env.flag_split }}' '\n' | tee -a $GITHUB_ENV
+
+      - name: Checkout device tree
+        uses: actions/checkout@v3
+        with:
+          repository: LineageOS/android_device_xiaomi_ginkgo
+          path: device/xiaomi/ginkgo
+
+      - name: Checkout vendor tree
+        uses: actions/checkout@v3
+        with:
+          repository: TheMuppets/proprietary_vendor_xiaomi
+          path: vendor/xiaomi/ginkgo
+
+      - name: Install adb and fastboot
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y android-tools-adb android-tools-fastboot
+
+      - name: Set up proprietary blobs extraction
+        run: |
+          cd device/xiaomi/ginkgo
+          ./extract-files.sh
+
+      - name: Upload proprietary blobs for debugging
+        uses: actions/upload-artifact@v3
+        with:
+          name: proprietary-blobs
+          path: vendor/xiaomi/ginkgo/proprietary
+
+  build_lineageos:
+    name: Build LineageOS
+    runs-on: ubuntu-latest
+    needs: extract-local
+    steps:
+      - name: Checkout LineageOS source code
+        uses: actions/checkout@v3
+        with:
+          repository: LineageOS/android
+          path: .
+
+      - name: Initialize and sync repo
+        run: |
+          repo init -u https://github.com/LineageOS/android.git -b lineage-18.1
+          repo sync -j$(nproc)
+
+      - name: Set up build environment
+        run: |
+          source build/envsetup.sh
+          lunch lineage_ginkgo-userdebug
+
+      - name: Build LineageOS image
+        run: |
+          make -j$(nproc) bacon
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: lineageos-image
+          path: out/target/product/ginkgo/*.zip
