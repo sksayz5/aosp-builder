@@ -1,4 +1,4 @@
-name: self-hosted extractor (Dev)
+name: Self-Hosted Extractor (Dev)
 
 on:
   repository_dispatch:
