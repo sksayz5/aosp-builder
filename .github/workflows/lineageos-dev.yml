@@ -12,7 +12,7 @@ on:
       android-version:
         description: "Android version"
         required: true
-        default: "ginkgo"
+        default: "RMX1901"
         type: string
       custom_env:
         description: "key=value;key=value"
@@ -29,8 +29,8 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       path_build: "/android/lineage"
-      manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
-      android-version: ${{ inputs.android-version || 'ginkgo' }}
+      manifest-branch: ${{ inputs.manifest-branch || 'lineage-21.0' }}
+      android-version: ${{ inputs.android-version || 'RMX1901' }}
     steps:
       - name: Set environment variable
         id: var
@@ -468,9 +468,9 @@ jobs:
               "${{ env.local_manifest }}"
           }
           # Function to add a project to the manifest
-          add_project "1" "device/xiaomi/ginkgo" "PixelOS-Devices/device_xiaomi_ginkgo" "eleven"
-          add_project "2" "vendor/xiaomi/ginkgo" "PixelOS-Devices/vendor_xiaomi_ginkgo" "eleven"
-          add_project "3" "kernel/xiaomi/ginkgo" "PixelOS-Devices/kernel_xiaomi_ginkgo" "eleven"
+          add_project "1" "device/realme/RMX1901" "shravansayz/device_realme_RMX1901_RUI2" "14-cr"
+          add_project "2" "vendor/realme/RMX1901" "shravansayz/vendor_realme_RMX1901" "14"
+          add_project "3" "kernel/realme/RMX1901" "shravansayz/kernel_realme_sdm710" "14"
 
           # ===== check local manifest =====
           cat ${{ env.local_manifest }}
@@ -524,10 +524,10 @@ jobs:
 
           # echo "===== ./device/xiaomi/sm6125-common/setup-makefiles.sh ====="
           # cat ./device/xiaomi/sm6125-common/setup-makefiles.sh
-          export DEVICE_COMMON=sm6125-common
-          export DEVICE=ginkgo
-          export VENDOR=xiaomi
-          source ./device/xiaomi/sm6125-common/setup-makefiles.sh
+          
+          export DEVICE=RMX1901
+          export VENDOR=realme
+          source ./device/xiaomi/RMX1901/setup-makefiles.sh
           # echo "===== ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk ====="
           # cat ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk
           # echo "===== ./vendor/xiaomi/sm6125-common/Android.mk ====="
@@ -549,7 +549,7 @@ jobs:
         with:
           name: "lineageos-build"
           tag: "lineageos"
-          artifacts: "${{ env.path_build }}/out/target/product/ginkgo/*.zip"
+          artifacts: "${{ env.path_build }}/out/target/product/RMX1901/*.zip"
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
