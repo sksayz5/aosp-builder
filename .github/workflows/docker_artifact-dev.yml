@@ -499,3 +499,5 @@ jobs:
         with:
           name: "${{ env.app_branch }}"
           path: "${{ env.dir_output }}/*.${{ env.target_ext }}"
+          retention-days: ${{ env.retention_days || '1' }}
+          
