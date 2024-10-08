@@ -1,4 +1,4 @@
-name: Download and Compress File
+name: Download Artifact (Dev)
 
 on:
   workflow_dispatch:
@@ -11,8 +11,8 @@ on:
 run-name: runs on ubuntu-24.04
 
 jobs:
-  download_and_compress:
-    name: Download and Compress File
+  download:
+    name: Download Artifact File
     runs-on: ubuntu-24.04
     env:
       compress: true
@@ -30,7 +30,7 @@ jobs:
           FILE_NAME=$(basename $FILE_URL)
           echo "::add-mask::$FILE_NAME"
           echo "Downloading file from $FILE_URL"
-          curl -sL -O "${{ env.dir_output }}/${FILE_NAME}" $FILE_URL
+          curl -sL $FILE_URL -o "${{ env.dir_output }}/${FILE_NAME}"
           echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
 
       - name: Compress File with Advanced Settings
