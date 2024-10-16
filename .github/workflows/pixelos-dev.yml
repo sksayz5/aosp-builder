@@ -1,4 +1,4 @@
-name: Build PixelOS (Dev)
+name: PixelOS (Dev)
 
 on:
   repository_dispatch:
