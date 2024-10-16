@@ -1,4 +1,4 @@
-name: Build PixielOS (Dev)
+name: Build PixelOS (Dev)
 
 on:
   repository_dispatch:
@@ -31,12 +31,14 @@ on:
 env:
   custom_env: ${{ inputs.custom_env || '' }}
 
-
 jobs:
   build:
-    name: Build PixielOS
+    name: Build PixelOS
     runs-on: ubuntu-24.04
-
+    env:
+      path_build: "/android/pixelos"
+      manifest-branch: ${{ inputs.manifest-branch || 'fourteen' }}
+      android-version: ${{ inputs.android-version || 'ginkgo' }}
     steps:
       - name: Set environment variable
         id: var
@@ -398,7 +400,7 @@ jobs:
           # export USE_CCACHE=1
           # export CCACHE_EXEC=/usr/bin/ccache
           # EOF
-          
+
       - name: Setup repo
         id: repo-setup
         working-directory: /
@@ -481,4 +483,3 @@ jobs:
           make -j$(nproc --all)
 
           echo "Build completed"
-          
