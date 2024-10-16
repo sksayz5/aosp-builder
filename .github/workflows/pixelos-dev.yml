@@ -479,8 +479,14 @@ jobs:
           source build/envsetup.sh
 
           echo "===== breakfast ${{ env.android-version }} ====="
+
+          # Lunch your device after cloning all device sources if needed.
+          # lunch aosp_devicecodename-ap2a-buildtype
           lunch pixielos_device-userdebug
-          make -j$(nproc --all)
+
+          echo "===== make -j$(nproc --all) ====="
+          # make -j$(nproc --all)
+          # Start compilation
+          mka bacon
 
           echo "Build completed"
-
