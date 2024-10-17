@@ -4,6 +4,11 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      manifest-repo:
+        description: "Manifest repository"
+        required: true
+        type: string
+        default: "https://github.com/LineageOS/android.git"
       manifest-branch:
         description: "Manifest branch"
         required: true
@@ -20,6 +25,8 @@ on:
         required: false
         default: ""
 
+run-name: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }} - ${{ inputs.manifest-branch || 'lineage-18.1' }} - ${{ inputs.android-version || 'ginkgo' }}
+
 env:
   custom_env: ${{ inputs.custom_env || '' }}
 
@@ -29,6 +36,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       path_build: "/android/lineage"
+      manifest-repo: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }}
       manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
       android-version: ${{ inputs.android-version || 'ginkgo' }}
     steps:
@@ -112,7 +120,7 @@ jobs:
           # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md
           sudo -E apt-get -qq -y update
           installed_packages=$(dpkg-query -W -f='${binary:Package}\n')
-          
+
           # ===== Clean Apt =====
           # ----- package for purge -----
           packages_purge=(
@@ -214,7 +222,7 @@ jobs:
           sudo -E apt-get -qq -y autoremove --purge
           sudo -E apt-get -qq clean
           sudo -E systemctl daemon-reload
-          
+
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
@@ -503,7 +511,7 @@ jobs:
           export REPO_ALLOW_SHALLOW=1
 
           repo init \
-            --manifest-url https://github.com/LineageOS/android.git \
+            --manifest-url ${{ env.manifest-repo }} \
             --manifest-branch ${{ env.manifest-branch }} \
             --no-clone-bundle \
             --depth=1 \
@@ -512,7 +520,7 @@ jobs:
 
           df -Th
           echo "Repository initialized"
-        
+
       - name: DIY xml
         working-directory: ${{ env.path_build }}
         run: |
