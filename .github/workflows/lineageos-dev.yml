@@ -25,6 +25,9 @@ on:
         required: false
         default: ""
 
+
+run-name: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }} - ${{ inputs.manifest-branch || 'lineage-18.1' }} - ${{ inputs.android-version || 'ginkgo' }}
+
 env:
   custom_env: ${{ inputs.custom_env || '' }}
 
