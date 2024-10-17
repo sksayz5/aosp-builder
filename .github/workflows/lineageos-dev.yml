@@ -4,6 +4,11 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      manifest-repo:
+        description: "Manifest repository"
+        required: true
+        type: string
+        default: "https://github.com/LineageOS/android.git"
       manifest-branch:
         description: "Manifest branch"
         required: true
@@ -29,6 +34,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       path_build: "/android/lineage"
+      manifest-repo: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }}
       manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
       android-version: ${{ inputs.android-version || 'ginkgo' }}
     steps:
@@ -413,7 +419,7 @@ jobs:
           export REPO_ALLOW_SHALLOW=1
 
           repo init \
-            --manifest-url https://github.com/LineageOS/android.git \
+            --manifest-url ${{ env.manifest-repo }} \
             --manifest-branch ${{ env.manifest-branch }} \
             --no-clone-bundle \
             --depth=1 \
@@ -437,7 +443,7 @@ jobs:
           mkdir -p .repo/local_manifests
           # touch ${{ env.local_manifest }}
           echo '<manifest></manifest>' > ${{ env.local_manifest }}
-          
+
           # ----- Blank local manifest -----
           # xmlstarlet ed --inplace --insert / -t elem -n "manifest" -v "" "${{ env.local_manifest }}"
 
