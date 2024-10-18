@@ -478,23 +478,37 @@ jobs:
 
       - name: Build PixieLOS
         id: build
+        env:
+          devicecodename: "${{ env.android-version }}"
         working-directory: ${{ env.path_build }}
         run: |
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
-          echo "===== source build/envsetup.sh ====="
+          # echo "===== source build/envsetup.sh ====="
+          # source build/envsetup.sh
+
+          # echo "===== breakfast ${{ env.android-version }} ====="
+
+          # # Lunch your device after cloning all device sources if needed.
+          # # lunch aosp_devicecodename-ap2a-buildtype
+          # lunch pixielos_device-userdebug
+
+          # echo "===== make -j$(nproc --all) ====="
+          # # make -j$(nproc --all)
+          # # Start compilation
+          # mka bacon
+
+          # Guide to Building PixelOS https://blog.pixelos.net/docs/MakePixelOS
+
+          echo "===== Initialize the ROM environment with the envsetup.sh script. ====="
           source build/envsetup.sh
 
-          echo "===== breakfast ${{ env.android-version }} ====="
+          echo "===== Lunch your device after cloning all device sources if needed. ====="
+          # lunch aosp_$devicecodename-ap2a-buildtype
+          lunch aosp_${{ env.devicecodename }}-user
 
-          # Lunch your device after cloning all device sources if needed.
-          # lunch aosp_devicecodename-ap2a-buildtype
-          lunch pixielos_device-userdebug
-
-          echo "===== make -j$(nproc --all) ====="
-          # make -j$(nproc --all)
-          # Start compilation
+          echo "===== Start compilation ====="
           mka bacon
 
           echo "Build completed"
