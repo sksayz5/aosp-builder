@@ -33,6 +33,8 @@ on:
         required: false
         default: ""
 
+run-name: ${{ inputs.manifest-repo || 'https://github.com/PixelOS-AOSP/manifest.git' }} - ${{ inputs.manifest-branch || 'fourteen' }} - ${{ inputs.android-version || 'ginkgo' }}
+
 env:
   custom_env: ${{ inputs.custom_env || '' }}
 
