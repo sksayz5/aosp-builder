@@ -564,8 +564,11 @@ jobs:
           echo "===== source build/envsetup.sh ====="
           source build/envsetup.sh
 
-          echo "===== breakfast ${{ env.android-version }} ====="
           set +e
+          echo "===== check ./vendor/etc/vintf/manifest/ ====="
+          ls -lh ./vendor/etc/vintf/manifest/
+
+          echo "===== breakfast ${{ env.android-version }} ====="
           breakfast ${{ env.android-version }}
           # ls -lh
           # ls -lh ./vendor/
