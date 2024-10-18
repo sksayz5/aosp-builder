@@ -20,8 +20,8 @@ on:
           - "twelve"
           - "eleven"
           - "ten"
-      android-version:
-        description: "Android version"
+      device-codename:
+        description: "Device codename"
         required: true
         type: choice
         default: "ginkgo"
@@ -33,7 +33,7 @@ on:
         required: false
         default: ""
 
-run-name: ${{ inputs.manifest-repo || 'https://github.com/PixelOS-AOSP/manifest.git' }} - ${{ inputs.manifest-branch || 'fourteen' }} - ${{ inputs.android-version || 'ginkgo' }}
+run-name: ${{ inputs.manifest-repo || 'https://github.com/PixelOS-AOSP/manifest.git' }} - ${{ inputs.manifest-branch || 'fourteen' }} - ${{ inputs.device-codename || 'ginkgo' }}
 
 env:
   custom_env: ${{ inputs.custom_env || '' }}
@@ -46,7 +46,7 @@ jobs:
       path_build: "/android/pixelos"
       manifest-repo: ${{ inputs.manifest-repo || 'https://github.com/PixelOS-AOSP/manifest.git' }}
       manifest-branch: ${{ inputs.manifest-branch || 'fourteen' }}
-      android-version: ${{ inputs.android-version || 'ginkgo' }}
+      device-codename: ${{ inputs.device-codename || 'ginkgo' }}
     steps:
       - name: Set environment variable
         id: var
@@ -478,8 +478,6 @@ jobs:
 
       - name: Build PixieLOS
         id: build
-        env:
-          devicecodename: "${{ env.android-version }}"
         working-directory: ${{ env.path_build }}
         run: |
           echo "Current working directory: $(pwd)"
@@ -488,7 +486,7 @@ jobs:
           # echo "===== source build/envsetup.sh ====="
           # source build/envsetup.sh
 
-          # echo "===== breakfast ${{ env.android-version }} ====="
+          # echo "===== breakfast ${{ env.device-codename }} ====="
 
           # # Lunch your device after cloning all device sources if needed.
           # # lunch aosp_devicecodename-ap2a-buildtype
@@ -506,7 +504,7 @@ jobs:
 
           echo "===== Lunch your device after cloning all device sources if needed. ====="
           # lunch aosp_$devicecodename-ap2a-buildtype
-          lunch aosp_${{ env.devicecodename }}-user
+          lunch aosp_${{ env.device-codename }}-user
 
           echo "===== Start compilation ====="
           mka bacon
