@@ -16,7 +16,7 @@ on:
         default: "fourteen"
         options:
           - "fourteen"
-          - "thirteen"
+          - "thirdteen"
           - "twelve"
           - "eleven"
           - "ten"
