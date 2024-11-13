@@ -560,10 +560,12 @@ jobs:
 
           # echo "===== ./device/xiaomi/sm6125-common/setup-makefiles.sh ====="
           # cat ./device/xiaomi/sm6125-common/setup-makefiles.sh
-          export DEVICE_COMMON=sm6125-common
-          export DEVICE=ginkgo
-          export VENDOR=xiaomi
-          source ./device/xiaomi/sm6125-common/setup-makefiles.sh
+
+          # export DEVICE_COMMON=sm6125-common
+          # export DEVICE=ginkgo
+          # export VENDOR=xiaomi
+          # source ./device/xiaomi/sm6125-common/setup-makefiles.sh
+
           # echo "===== ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk ====="
           # cat ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk
           # echo "===== ./vendor/xiaomi/sm6125-common/Android.mk ====="
