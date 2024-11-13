@@ -12,7 +12,7 @@ on:
 
 jobs:
   uboot:
-    name: ${{ matrix.workflows_inputs.device_branch }}
+    name: ${{ matrix.workflows_inputs.android-version }}
     uses: ./.github/workflows/lineageos-dev.yml
     strategy:
       fail-fast: false
