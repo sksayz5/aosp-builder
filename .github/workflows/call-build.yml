@@ -24,10 +24,10 @@ jobs:
             android-version: "ginkgo"
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "cm-14.1"
-            android-version: "cm_android_x86_64"
+            android-version: "x86_64"
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "cm-14.1"
-            android-version: "cm_android_x86"
+            android-version: "x86"
     with:
       runner_image: ${{ matrix.runner_image }}
       manifest-repo: ${{ matrix.workflows_inputs.manifest-repo }}
