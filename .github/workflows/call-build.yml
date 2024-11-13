@@ -1,0 +1,29 @@
+name: Call Build
+
+# https://docs.github.com/zh/actions/writing-workflows/workflow-syntax-for-github-actions
+run-name: Build Matrix for AOSP
+
+on:
+  # schedule:
+  #   # Run every day at 20:00 UTC
+  #   - cron: "0 20 * * *"
+  repository_dispatch:
+  workflow_dispatch:
+
+jobs:
+  uboot:
+    name: ${{ matrix.workflows_inputs.device_branch }}
+    uses: ./.github/workflows/lineageos-dev.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        runner_image: ["ubuntu-24.04"]
+        workflows_inputs:
+          - manifest-repo: "https://github.com/LineageOS/android.git"
+            manifest-branch: "lineage-18.1"
+            android-version: "ginkgo"
+    with:
+      runner_image: ${{ matrix.runner_image }}
+      manifest-repo: ${{ matrix.workflows_inputs.manifest-repo }}
+      manifest-branch: ${{ matrix.workflows_inputs.manifest-branch }}
+      android-version: ${{ matrix.workflows_inputs.android-version }}

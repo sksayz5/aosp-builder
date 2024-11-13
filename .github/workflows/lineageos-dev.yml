@@ -4,6 +4,11 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      runner_image:
+        description: "Runner Image"
+        type: string
+        required: false
+        default: "ubuntu-latest"
       manifest-repo:
         description: "Manifest repository"
         required: true
@@ -24,6 +29,28 @@ on:
         type: string
         required: false
         default: ""
+  workflow_call:
+    inputs:
+      runner_image:
+        description: "Runner Image"
+        type: string
+        required: true
+      manifest-repo:
+        description: "Manifest repository"
+        type: string
+        required: true
+      manifest-branch:
+        description: "Manifest branch"
+        required: true
+        type: string
+      android-version:
+        description: "Android version"
+        required: true
+        type: string
+      custom_env:
+        description: "key=value;key=value"
+        type: string
+        required: false
 
 run-name: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }} - ${{ inputs.manifest-branch || 'lineage-18.1' }} - ${{ inputs.android-version || 'ginkgo' }}
 
@@ -33,7 +60,7 @@ env:
 jobs:
   build:
     name: Build LineageOS
-    runs-on: ubuntu-24.04
+    runs-on: ${{ inputs.runner_image || 'ubuntu-latest' }}
     env:
       path_build: "/android/lineage"
       manifest-repo: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }}
@@ -435,6 +462,7 @@ jobs:
 
       - name: Generate local manifest
         id: local-manifest
+        if: ${{ 'true' == 'false' }} # disable
         env:
           local_manifest: .repo/local_manifests/local_manifest.xml
         working-directory: ${{ env.path_build }}
