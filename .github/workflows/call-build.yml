@@ -20,9 +20,12 @@ jobs:
         runner_image: ["ubuntu-24.04"]
         workflows_inputs:
           # https://wiki.lineageos.org/emulator
+          # - manifest-repo: "https://github.com/LineageOS/android.git"
+          #   manifest-branch: "lineage-18.1"
+          #   android-version: "ginkgo"
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "lineage-18.1"
-            android-version: "ginkgo"
+            android-version: "merlinx"
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "lineage-18.1"
             android-version: "x86"

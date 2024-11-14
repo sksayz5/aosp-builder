@@ -620,8 +620,8 @@ jobs:
           mka recoveryimage
           mka iso_img
 
-          # 使用 brunch 设置环境并构建
-          brunch ${{ env.android-version }} eng
+          # # 使用 brunch 设置环境并构建
+          # brunch ${{ env.android-version }} eng
 
           echo "Build completed"
 
