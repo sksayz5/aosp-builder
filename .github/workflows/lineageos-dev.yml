@@ -299,7 +299,8 @@ jobs:
             "pngcrush"
             # "vim"
             "xmlstarlet"
-            "ncurses"
+            # "ncurses"
+            "libncurses-dev"
           )
           sudo -E apt-get -y -qq update
           sudo -E apt-get -y -qq install "${packages_slim[@]}"
