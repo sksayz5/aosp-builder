@@ -611,14 +611,14 @@ jobs:
           # - **`brunch`**：LineageOS 的命令，结合了 `breakfast` 和 `mka`，用于设置环境并启动构建。
 
           # # 使用 breakfast 设置构建环境
-          # breakfast ${{ env.android-version }}-eng
+          # breakfast ${{ env.android-version }} eng
 
-          # # 或者使用 lunch 设置构建环境
-          # lunch ${{ env.android-version }}-eng
+          # 或者使用 lunch 设置构建环境
+          lunch ${{ env.android-version }} eng
 
-          # 使用 mka 构建特定目标
-          # mka recoveryimage
-          # mka iso_img
+          使用 mka 构建特定目标
+          mka recoveryimage
+          mka iso_img
 
           # 使用 brunch 设置环境并构建
           brunch ${{ env.android-version }} eng
