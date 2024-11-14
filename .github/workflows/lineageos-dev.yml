@@ -573,14 +573,53 @@ jobs:
           # set -e
 
           # userdebug, user, eng
-          breakfast ${{ env.android-version }} eng
+          # 1. **`user`**：
+          #   - **用途**：用于发布给最终用户的版本。
+          #   - **特点**：
+          #     - 启用了所有的安全特性。
+          #     - 禁用了调试功能。
+          #     - 进行了优化以提高性能。
+          #   - **适用场景**：正式发布的生产环境版本。
+
+          # 2. **`userdebug`**：
+          #   - **用途**：用于开发和测试的版本。
+          #   - **特点**：
+          #     - 基于 `user` 版本，但启用了调试功能。
+          #     - 包含额外的调试工具和选项。
+          #     - 可以通过 `adb` 访问和调试设备。
+          #   - **适用场景**：开发和测试阶段，允许调试和测试。
+
+          # 3. **`eng`**：
+          #   - **用途**：用于工程师开发的版本。
+          #   - **特点**：
+          #     - 启用了所有调试功能和工具。
+          #     - 禁用了某些优化，以便更容易调试。
+          #     - 包含更多的日志和调试信息。
+          #   - **适用场景**：开发阶段，工程师需要完全的调试和测试能力。
+          # breakfast ${{ env.android-version }} eng
 
           # echo "===== croot ====="
           # croot
           # echo "===== brunch ${{ env.android-version }} ====="
           # brunch ${{ env.android-version }}
 
-          mka
+          # ---------- mka ----------
+          # - **`breakfast`**：LineageOS 的命令，用于设置构建环境，类似于 `lunch`。
+          # - **`lunch`**：Android 的命令，用于设置构建环境。
+          # - **`brunch`**：LineageOS 的命令，结合了 `breakfast` 和 `mka`，用于设置环境并启动构建。
+
+          # # 使用 breakfast 设置构建环境
+          # breakfast ${{ env.android-version }}-eng
+
+          # # 或者使用 lunch 设置构建环境
+          # lunch ${{ env.android-version }}-eng
+
+          # 使用 mka 构建特定目标
+          # mka recoveryimage
+          # mka iso_img
+
+          # 使用 brunch 设置环境并构建
+          brunch ${{ env.android-version }} eng
 
           echo "Build completed"
 
