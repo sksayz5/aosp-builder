@@ -27,14 +27,14 @@ jobs:
             manifest-branch: "lineage-18.1"
             android-version: "x86"
           - manifest-repo: "https://github.com/LineageOS/android.git"
-            manifest-branch: "cm-14.1"
-            android-version: "x86"
-          - manifest-repo: "https://github.com/LineageOS/android.git"
-            manifest-branch: "cm-14.1"
-            android-version: "x86"
-          - manifest-repo: "https://github.com/LineageOS/android.git"
-            manifest-branch: "cm-11.0"
+            manifest-branch: "lineage-18.1"
             android-version: "x86_64"
+          - manifest-repo: "https://github.com/LineageOS/android.git"
+            manifest-branch: "cm-14.1"
+            android-version: "x86"
+          - manifest-repo: "https://github.com/LineageOS/android.git"
+            manifest-branch: "cm-14.1"
+            android-version: "x86"
     with:
       runner_image: ${{ matrix.runner_image }}
       manifest-repo: ${{ matrix.workflows_inputs.manifest-repo }}
