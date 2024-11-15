@@ -596,12 +596,12 @@ jobs:
           set -e
 
           # 使用 lunch 设置构建环境
-          echo "===== lunch ${{ env.android-version }} ====="
+          echo "===== lunch aosp_${{ env.android-version }}-eng ====="
           lunch aosp_${{ env.android-version }}-eng
 
           # 使用 breakfast 设置构建环境
-          echo "===== breakfast ${{ env.android-version }} ====="
-          breakfast ${{ env.android-version }}
+          # echo "===== breakfast ${{ env.android-version }} ====="
+          # breakfast ${{ env.android-version }}
 
           # 使用 mka 构建特定目标
           mka recoveryimage
