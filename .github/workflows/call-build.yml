@@ -54,5 +54,5 @@ jobs:
       manifest-branch: ${{ matrix.workflows_inputs.manifest-branch }}
       device_code: ${{ matrix.workflows_inputs.device_code }}
       lunch_code: ${{ matrix.workflows_inputs.lunch_code }}
-      breakfast_code: ${{ matrix.workflows_inputs.device_code || '' }}
-      brunch_code: ${{ matrix.workflows_inputs.device_code || '' }}
+      breakfast_code: ${{ matrix.workflows_inputs.breakfast_code || '' }}
+      brunch_code: ${{ matrix.workflows_inputs.brunch_code || '' }}
