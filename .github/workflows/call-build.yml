@@ -20,6 +20,12 @@ jobs:
         runner_image: ["ubuntu-24.04"]
         workflows_inputs:
           # https://wiki.lineageos.org/emulator
+          # Different versions of LineageOS require different JDK (Java Development Kit) versions.
+          # LineageOS 18.1+: OpenJDK 11 (included in source download)
+          # LineageOS 16.0-17.1: OpenJDK 1.9 (included in source download)
+          # LineageOS 14.1-15.1: OpenJDK 1.8 (install openjdk-8-jdk)
+          # NOTE: For building these versions you’ll need to remove TLSv1 and TLSv1.1 from jdk.tls.disabledAlgorithms in /etc/java-8-openjdk/security/java.security.
+          # LineageOS 11.0-13.0: OpenJDK 1.7 (install openjdk-7-jdk)*
           # ========== Phone ==========
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "lineage-17.1"
@@ -52,6 +58,7 @@ jobs:
             manifest-branch: "cm-14.1"
             device_code: "x86_64"
             lunch_code: "aosp_x86_64-eng"
+            java-version: "8"
     with:
       runner_image: ${{ matrix.runner_image }}
       manifest-repo: ${{ matrix.workflows_inputs.manifest-repo }}
@@ -60,3 +67,4 @@ jobs:
       lunch_code: ${{ matrix.workflows_inputs.lunch_code || '' }}
       breakfast_code: ${{ matrix.workflows_inputs.breakfast_code || '' }}
       brunch_code: ${{ matrix.workflows_inputs.brunch_code || '' }}
+      java-version: ${{ matrix.workflows_inputs.java-version || '11' }}
