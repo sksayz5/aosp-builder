@@ -20,21 +20,34 @@ jobs:
         runner_image: ["ubuntu-24.04"]
         workflows_inputs:
           # https://wiki.lineageos.org/emulator
-          # - manifest-repo: "https://github.com/LineageOS/android.git"
-          #   manifest-branch: "lineage-18.1"
-          #   device_code: "ginkgo"
+          # ========== Phone ==========
+          - manifest-repo: "https://github.com/LineageOS/android.git"
+            manifest-branch: "lineage-17.1"
+            device_code: "ginkgo"
+            lunch_code: "lineage_arm-userdebug"
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "lineage-18.1"
             device_code: "flame"
+            lunch_code: "lineage_arm-userdebug"
+          # ========== x86_64 ==========
+          # ---------- lineage-17.1 ----------
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "lineage-17.1"
             device_code: "x86_64"
+            lunch_code: "lineage_x86_64-userdebug"
+          - manifest-repo: "https://github.com/LineageOS/android.git"
+            manifest-branch: "lineage-17.1"
+            device_code: "x86_64"
+            lunch_code: "aosp_x86_64-eng"
+          # ---------- lineage-14.1 ----------
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "cm-14.1"
             device_code: "x86_64"
+            lunch_code: "aosp_x86_64-eng"
+          # ---------- lineage-11.0 ----------
           - manifest-repo: "https://github.com/LineageOS/android.git"
             manifest-branch: "cm-11.0"
-            device_code: "x86_64"
+            device_code: "aosp_x86-eng"
     with:
       runner_image: ${{ matrix.runner_image }}
       manifest-repo: ${{ matrix.workflows_inputs.manifest-repo }}
