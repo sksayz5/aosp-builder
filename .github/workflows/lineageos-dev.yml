@@ -9,6 +9,11 @@ on:
         type: string
         required: false
         default: "ubuntu-latest"
+      java-version:
+        description: "Java version"
+        required: false
+        default: "11"
+        type: string
       custom_env:
         description: "key=value;key=value"
         type: string
@@ -50,6 +55,10 @@ on:
         description: "Runner Image"
         type: string
         required: true
+      java-version:
+        description: "Java version"
+        required: false
+        type: string
       custom_env:
         description: "key=value;key=value"
         type: string
@@ -160,7 +169,7 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
           VERSION_GCC: 13
-          VERSION_JDK: 21
+          VERSION_JDK: ${{ inputs.java-version || '11' }}
         working-directory: /
         run: |
           echo -e "Current working directory: $(pwd)"
@@ -345,7 +354,7 @@ jobs:
         uses: actions/setup-java@main
         with:
           distribution: "temurin"
-          java-version: 21
+          java-version: ${{ inputs.java-version || '11' }}
 
       - name: Check Workspace
         id: check-workspace
