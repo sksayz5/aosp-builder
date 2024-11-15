@@ -583,12 +583,13 @@ jobs:
           #     - 包含更多的日志和调试信息。
           #   - **适用场景**：开发阶段，工程师需要完全的调试和测试能力。
 
+          # ---------- Prepare the device-specific code ----------
           echo "===== source build/envsetup.sh ====="
           source build/envsetup.sh
 
           # 使用 breakfast 设置构建环境
           echo "===== breakfast ${{ env.android-version }} ====="
-          breakfast ${{ env.android-version }} eng
+          breakfast ${{ env.android-version }}
 
           # 或者使用 lunch 设置构建环境
           echo "===== lunch ${{ env.android-version }} ====="
