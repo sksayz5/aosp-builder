@@ -90,8 +90,8 @@ jobs:
     runs-on: ${{ inputs.runner_image || 'ubuntu-latest' }}
     env:
       path_build: "/android/lineage"
-      manifest-repo: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }}
-      manifest-branch: ${{ inputs.manifest-branch || 'lineage-18.1' }}
+      manifest-repo: ${{ inputs.manifest-repo }}
+      manifest-branch: ${{ inputs.manifest-branch }}
       device_code: ${{ inputs.device_code }}
     steps:
       - name: Set environment variable
