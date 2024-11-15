@@ -616,7 +616,7 @@ jobs:
           # 或者使用 lunch 设置构建环境
           lunch ${{ env.android-version }}-eng
 
-          使用 mka 构建特定目标
+          # 使用 mka 构建特定目标
           mka recoveryimage
           mka iso_img
 
