@@ -79,14 +79,14 @@ on:
         required: false
         type: string
 
-run-name: ${{ inputs.manifest-repo || 'https://github.com/LineageOS/android.git' }} - ${{ inputs.manifest-branch || 'lineage-18.1' }} - ${{ inputs.device_code || 'ginkgo' }}
+run-name: ${{ inputs.manifest-repo }} - ${{ inputs.manifest-branch }} - ${{ inputs.lunch_code }} ${{ inputs.breakfast_code }} ${{ inputs.brunch_code }}
 
 env:
   custom_env: ${{ inputs.custom_env || '' }}
 
 jobs:
   build:
-    name: Build LineageOS - ${{ inputs.manifest-branch }}
+    name: ${{ inputs.manifest-repo }} - ${{ inputs.manifest-branch }} - ${{ inputs.lunch_code }} ${{ inputs.breakfast_code }} ${{ inputs.brunch_code }}
     runs-on: ${{ inputs.runner_image || 'ubuntu-latest' }}
     env:
       path_build: "/android/lineage"
