@@ -586,6 +586,8 @@ jobs:
           # ---------- Prepare the device-specific code ----------
           echo "===== source build/envsetup.sh ====="
           source build/envsetup.sh
+          echo "===== Lunch menu ====="
+          lunch
 
           # 使用 breakfast 设置构建环境
           echo "===== breakfast ${{ env.android-version }} ====="
