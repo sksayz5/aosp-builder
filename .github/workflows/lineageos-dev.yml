@@ -548,33 +548,17 @@ jobs:
           echo "Current working directory: $(pwd)"
           export PATH=~/bin:$PATH
 
-          echo "===== source build/envsetup.sh ====="
-          source build/envsetup.sh
+          # echo "===== croot ====="
+          # croot
+          # echo "===== brunch ${{ env.android-version }} ====="
+          # brunch ${{ env.android-version }}
 
-          # echo "===== breakfast ${{ env.android-version }} ====="
-          # set +e
-          # breakfast ${{ env.android-version }}
-          # # ls -lh
-          # # ls -lh ./vendor/
-          # # ls -lh ./device/
-          # # ls -lh ./device/xiaomi/
-          # # ls -lh ./device/xiaomi/sm6125-common/
+          # ---------- mka ----------
+          # - **`breakfast`**：LineageOS 的命令，用于设置构建环境，类似于 `lunch`。
+          # - **`lunch`**：Android 的命令，用于设置构建环境。
+          # - **`brunch`**：LineageOS 的命令，结合了 `breakfast` 和 `mka`，用于设置环境并启动构建。
 
-          # # echo "===== ./device/xiaomi/sm6125-common/setup-makefiles.sh ====="
-          # # cat ./device/xiaomi/sm6125-common/setup-makefiles.sh
-
-          # # export DEVICE_COMMON=sm6125-common
-          # # export DEVICE=ginkgo
-          # # export VENDOR=xiaomi
-          # # source ./device/xiaomi/sm6125-common/setup-makefiles.sh
-
-          # # echo "===== ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk ====="
-          # # cat ./vendor/xiaomi/sm6125-common/sm6125-common-vendor.mk
-          # # echo "===== ./vendor/xiaomi/sm6125-common/Android.mk ====="
-          # # cat ./vendor/xiaomi/sm6125-common/Android.mk
-          # set -e
-
-          # userdebug, user, eng
+          # ---------- userdebug, user, eng ----------
           # 1. **`user`**：
           #   - **用途**：用于发布给最终用户的版本。
           #   - **特点**：
@@ -598,23 +582,17 @@ jobs:
           #     - 禁用了某些优化，以便更容易调试。
           #     - 包含更多的日志和调试信息。
           #   - **适用场景**：开发阶段，工程师需要完全的调试和测试能力。
-          # breakfast ${{ env.android-version }} eng
 
-          # echo "===== croot ====="
-          # croot
-          # echo "===== brunch ${{ env.android-version }} ====="
-          # brunch ${{ env.android-version }}
+          echo "===== source build/envsetup.sh ====="
+          source build/envsetup.sh
 
-          # ---------- mka ----------
-          # - **`breakfast`**：LineageOS 的命令，用于设置构建环境，类似于 `lunch`。
-          # - **`lunch`**：Android 的命令，用于设置构建环境。
-          # - **`brunch`**：LineageOS 的命令，结合了 `breakfast` 和 `mka`，用于设置环境并启动构建。
-
-          # # 使用 breakfast 设置构建环境
-          # breakfast ${{ env.android-version }} eng
+          # 使用 breakfast 设置构建环境
+          echo "===== breakfast ${{ env.android-version }} ====="
+          breakfast ${{ env.android-version }} eng
 
           # 或者使用 lunch 设置构建环境
-          lunch ${{ env.android-version }}-eng
+          echo "===== lunch ${{ env.android-version }} ====="
+          lunch ${{ env.android-version }} eng
 
           # 使用 mka 构建特定目标
           mka recoveryimage
