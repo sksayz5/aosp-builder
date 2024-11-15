@@ -586,18 +586,22 @@ jobs:
           # ---------- Prepare the device-specific code ----------
           echo "===== source build/envsetup.sh ====="
           source build/envsetup.sh
-          echo "===== Lunch menu ====="
+
+          echo "===== menu lunch/breakfast ====="
           set +e
+          echo "----- lunch menu -----"
           lunch
+          echo "----- breakfast menu -----"
+          breakfast
           set -e
+
+          # 使用 lunch 设置构建环境
+          echo "===== lunch ${{ env.android-version }} ====="
+          lunch aosp_${{ env.android-version }}-eng
 
           # 使用 breakfast 设置构建环境
           echo "===== breakfast ${{ env.android-version }} ====="
           breakfast ${{ env.android-version }}
-
-          # 或者使用 lunch 设置构建环境
-          echo "===== lunch ${{ env.android-version }} ====="
-          lunch ${{ env.android-version }}-eng
 
           # 使用 mka 构建特定目标
           mka recoveryimage
