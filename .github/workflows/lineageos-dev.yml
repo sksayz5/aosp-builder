@@ -639,6 +639,9 @@ jobs:
             echo "===== lunch: ${{ inputs.lunch_code }} ====="
             lunch ${{ inputs.lunch_code }}
             # 使用 mka 构建特定目标
+            set +e
+            mka
+            set -e
             mka recoveryimage
             mka iso_img
           elif [ -n "${{ inputs.breakfast_code }}" ]; then
@@ -646,6 +649,9 @@ jobs:
             echo "===== breakfast: ${{ inputs.breakfast_code }} ====="
             breakfast ${{ inputs.breakfast_code }}
             # 使用 mka 构建特定目标
+            set +e
+            mka
+            set -e
             mka recoveryimage
             mka iso_img
           elif [ -n "${{ inputs.brunch_code }}" ]; then
