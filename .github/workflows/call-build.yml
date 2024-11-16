@@ -1,7 +1,7 @@
 name: Call Build
 
 # https://docs.github.com/zh/actions/writing-workflows/workflow-syntax-for-github-actions
-run-name: Build Matrix for AOSP
+run-name: Build AOSP
 
 on:
   # schedule:
@@ -27,16 +27,16 @@ jobs:
           # NOTE: For building these versions you’ll need to remove TLSv1 and TLSv1.1 from jdk.tls.disabledAlgorithms in /etc/java-8-openjdk/security/java.security.
           # LineageOS 11.0-13.0: OpenJDK 1.7 (install openjdk-7-jdk)*
           # ========== Phone ==========
+          - manifest-repo: "https://github.com/DerpFest-AOSP/manifest.git"
+            manifest-branch: "15"
+            device_code: "RMX1901"
+            lunch_code: "derp_arm-userdebug"
+          - manifest-repo: "https://github.com/DerpFest-AOSP/manifest.git"
+            manifest-branch: "15"
+            device_code: "RMX1901"
+            brunch_code: "derp_arm64-userdebug"
           - manifest-repo: "https://github.com/LineageOS/android.git"
-            manifest-branch: "lineage-17.1"
-            device_code: "ginkgo"
-            lunch_code: "lineage_arm-userdebug"
-          - manifest-repo: "https://github.com/LineageOS/android.git"
-            manifest-branch: "lineage-17.1"
-            device_code: "ginkgo"
-            brunch_code: "lineage_arm64-userdebug"
-          - manifest-repo: "https://github.com/LineageOS/android.git"
-            manifest-branch: "lineage-18.1"
+            manifest-branch: "lineage-22.0"
             device_code: "flame"
             lunch_code: "lineage_arm-userdebug"
           - manifest-repo: "https://github.com/LineageOS/android.git"
