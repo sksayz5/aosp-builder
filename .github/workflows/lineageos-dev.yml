@@ -23,16 +23,16 @@ on:
         description: "Manifest repository"
         required: true
         type: string
-        default: "https://github.com/LineageOS/android.git"
+        default: "https://github.com/DerpFest-AOSP/manifest.git"
       manifest-branch:
         description: "Manifest branch"
         required: true
-        default: "lineage-18.1"
+        default: "15"
         type: string
       device_code:
         description: "Android version"
         required: true
-        default: "ginkgo"
+        default: "RMX1901"
         type: string
       lunch_code:
         description: "lunch code"
@@ -542,9 +542,9 @@ jobs:
               "${{ env.local_manifest }}"
           }
           # Function to add a project to the manifest
-          add_project "1" "device/xiaomi/ginkgo" "PixelOS-Devices/device_xiaomi_ginkgo" "eleven"
-          add_project "2" "vendor/xiaomi/ginkgo" "PixelOS-Devices/vendor_xiaomi_ginkgo" "eleven"
-          add_project "3" "kernel/xiaomi/ginkgo" "PixelOS-Devices/kernel_xiaomi_ginkgo" "eleven"
+          add_project "1" "device/realme/RMX1901" "shravansayz/device_realme_RMX1901" "15-derp"
+          add_project "2" "vendor/realme/RMX1901" "shravansayz/vendor_realme_RMX1901" "15"
+          add_project "3" "kernel/realme/sdm710" "shravansayz/kernel_realme_sdm710" "14"
 
           # ===== check local manifest =====
           cat ${{ env.local_manifest }}
@@ -678,7 +678,7 @@ jobs:
         with:
           name: "lineageos-build"
           tag: "lineageos"
-          artifacts: "${{ env.path_build }}/out/target/product/ginkgo/*.zip"
+          artifacts: "${{ env.path_build }}/out/target/product/RMX1901/*.zip"
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
